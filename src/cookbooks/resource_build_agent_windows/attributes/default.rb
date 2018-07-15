@@ -57,6 +57,36 @@ default['git']['url'] = 'https://github.com/git-for-windows/git/releases/downloa
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
 #
+# JENKINS
+#
+
+default['jenkins']['service']['exe'] = 'jenkins_service'
+default['jenkins']['service']['name'] = 'jenkins'
+default['jenkins']['service']['user_name'] = 'jenkins_user'
+default['jenkins']['service']['user_password'] = SecureRandom.uuid
+
+default['jenkins']['version'] = '3.13'
+default['jenkins']['checksum'] = '85197CCED609BB36EFC677813BCD3242813569970FF32BEF49A10EE6AD7FB630'
+default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
+
+#
+# JOLOKIA
+#
+
+default['jolokia']['path']['jar'] = "#{ops_path}/jolokia"
+default['jolokia']['path']['jar_file'] = "#{node['jolokia']['path']['jar']}/jolokia.jar"
+
+default['jolokia']['agent']['context'] = 'jolokia' # Set this to default because the runtime gets angry otherwise
+default['jolokia']['agent']['host'] = '127.0.0.1' # Windows prefers going to IPv6, but Jolokia hates IPv6
+default['jolokia']['agent']['port'] = 8090
+
+default['jolokia']['telegraf']['consul_template_inputs_file'] = 'telegraf_jolokia_inputs.ctmpl'
+
+default['jolokia']['version'] = '1.6.0'
+default['jolokia']['checksum'] = '40123D4728CB62BF7D4FD3C8DE7CF3A0F955F89453A645837E611BA8E6924E02'
+default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/#{node['jolokia']['version']}/jolokia-jvm-#{node['jolokia']['version']}-agent.jar"
+
+#
 # NUGET
 #
 
@@ -73,3 +103,12 @@ default['nuget']['path']['cache'] = 'e:/nuget'
 #
 
 default['telegraf']['config_directory'] = "#{config_path}/#{node['telegraf']['service']['name']}"
+
+#
+# WINSW
+#
+
+default['winsw']['version'] = '2.1.2'
+default['winsw']['url'] = "https://github.com/kohsuke/winsw/releases/download/winsw-v#{node['winsw']['version']}/WinSW.NET4.exe"
+
+default['winsw']['path']['bin'] = "#{ops_path}/winsw"
