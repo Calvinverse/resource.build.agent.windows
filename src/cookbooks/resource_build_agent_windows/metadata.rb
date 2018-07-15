@@ -14,5 +14,6 @@ version '${VersionSemantic}'
 supports 'windows', '>= 2016'
 
 depends 'firewall', '= 2.6.1'
+depends 'git', '= 9.0.1'
 depends 'java_se', '= 8.171.0'
 depends 'windows', '= 3.1.0'
