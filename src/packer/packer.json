@@ -1,0 +1,166 @@
+{
+    "variables": {
+        "admin_username": "admin",
+        "admin_password": "admin",
+
+        "cookbook_name": "not_really_a_cookbook_name",
+
+        "dir_cookbooks_src": "src/cookbooks",
+        "dir_cookbooks_vendors": "packages/vendor/cookbooks",
+        "dir_http_user": null,
+        "dir_src_provisioning": "src/provisioning",
+        "dir_temp": null,
+        "dir_vm_import": null,
+
+        "vm_import_directory": null,
+        "vm_name": "not_really_a_vm_name",
+        "vm_ram_size_in_mb": "1024",
+        "vm_switch_name": "this_switch_does_not_exist",
+        "vm_switch_vlan": ""
+    },
+    "builders": [
+        {
+            "boot_wait": "5s",
+            "boot_command": [],
+            "clone_from_vmxc_path": "{{ user `dir_vm_import` }}",
+            "communicator": "ssh",
+            "enable_dynamic_memory": false,
+            "enable_mac_spoofing": false,
+            "enable_secure_boot": false,
+            "enable_virtualization_extensions": false,
+            "generation": 2,
+            "guest_additions_mode": "disable",
+            "headless": true,
+            "http_directory": "{{ user `dir_http_user` }}",
+            "http_port_min": 8150,
+            "http_port_max": 8160,
+            "output_directory": "{{ user `dir_temp` }}/{{ user `vm_name` }}",
+            "ram_size": "{{ user `vm_ram_size_in_mb` }}",
+            "shutdown_command": "echo '{{user `admin_password`}}' | sudo -S -E shutdown -P now",
+            "shutdown_timeout": "5m",
+            "skip_compaction": false,
+            "ssh_password": "{{user `admin_password`}}",
+            "ssh_timeout": "4h",
+            "ssh_username": "{{user `admin_username`}}",
+            "switch_name": "{{user `vm_switch_name`}}",
+            "type": "hyperv-vmcx",
+            "vlan_id": "{{ user `vm_switch_vlan` }}",
+            "vm_name": "{{ user `vm_name` }}"
+        }
+    ],
+    "provisioners": [
+        {
+            "command": "Set-VM -Name {{ user `vm_name` }} -AutomaticCheckpointsEnabled $false",
+            "execute_command": ["Powershell.exe", "-NonInteractive", "-NoLogo", "-NoProfile", "-Command", "{{.Command}}"],
+            "type": "shell-local"
+        },
+        {
+            "command": "Get-VMSnapshot -VMName {{ user `vm_name` }} | Remove-VMSnapshot",
+            "execute_command": ["Powershell.exe", "-NonInteractive", "-NoLogo", "-NoProfile", "-Command", "{{.Command}}"],
+            "type": "shell-local"
+        },
+
+        {
+            "inline": "New-Item -Path c:/temp_dvd -ItemType Directory; $drive = 'd:'; if (Test-Path 'e:/client.rb') { $drive = 'e:'} else { if (Test-Path 'f:/client.rb') { $drive = 'f:'} }; Copy-Item \"$($drive)/*\" c:/temp_dvd -Recurse",
+            "type": "powershell"
+        },
+        {
+            "inline": "$dvdDrive = Get-WmiObject -Class Win32_Volume -Filter \"DriveType=5\"; if ($dvdDrive -ne $null) { $dvdDriveLetter = $dvdDrive | Select-Object -ExpandProperty DriveLetter; if (-not (Test-Path -Path 'f:')) { $dvdDrive | Set-WmiInstance -Arguments @{ DriveLetter='f:'} }",
+            "type": "powershell"
+        },
+
+        {
+            "destination": "c:/config/unbound/unbound_zones.conf",
+            "source": "{{ user `dir_src_provisioning` }}/unbound_zones.conf",
+            "type": "file"
+        },
+
+        {
+            "env_var_format": "$env:%s=\"%s\"; ",
+            "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
+            "inline": [
+                "New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/workspace.vhdx' -SizeBytes 100GB",
+                "Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/workspace.vhdx'"
+            ],
+            "tempfile_extension": ".ps1",
+            "type": "shell-local"
+        },
+        {
+            "inline": "Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'workspace' -Confirm:$false",
+            "type": "powershell"
+        },
+
+        {
+            "env_var_format": "$env:%s=\"%s\"; ",
+            "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
+            "inline": [
+                "New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/cache.vhdx' -SizeBytes 50GB -BlockSizeBytes 1MB",
+                "Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/cache.vhdx'"
+            ],
+            "tempfile_extension": ".ps1",
+            "type": "shell-local"
+        },
+        {
+            "inline": "Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false",
+            "type": "powershell"
+        },
+
+        {
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "Start-Process 'msiexec' -ArgumentList '/qb /i c:\\temp_dvd\\chef.msi' -NoNewWindow -Wait",
+            "type": "powershell"
+        },
+        {
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "& c:\\temp_dvd\\chefservice.exe -install ",
+            "type": "powershell"
+        },
+
+        {
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "& c:\\temp_dvd\\eis-chef.exe --local-mode --config c:\\temp_dvd\\client.rb --override-runlist \"{{ user `cookbook_name` }}::default\" --log-level info ",
+            "type": "powershell"
+        },
+
+        {
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "& c:\\temp_dvd\\chefservice.exe -uninstall ",
+            "type": "powershell"
+        },
+        {
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "Start-Process 'msiexec' -ArgumentList '/qb /x C:\\temp_dvd\\chef.msi' -NoNewWindow -Wait",
+            "type": "powershell"
+        },
+
+        {
+            "env_var_format": "$env:%s=\"%s\"; ",
+            "execute_command" : ["powershell.exe", "{{.Vars}} {{.Script}}"],
+            "inline": ["{{ user `dir_scripts_user` }}/Copy-LogFilesFromVm.ps1 -vmName {{ user `vm_name` }} -userName {{ user `admin_username` }} -userPassword {{ user `admin_password` }} -targetDirectory {{ user `dir_log` }}/packer.beforesysprep"],
+            "tempfile_extension": ".ps1",
+            "type": "shell-local"
+        },
+
+        {
+            "inline": "Remove-Item c:/config/unbound/unbound_zones.conf -Force",
+            "type": "powershell"
+        },
+
+        {
+            "elevated_user": "{{user `admin_username`}}",
+            "elevated_password": "{{user `admin_password`}}",
+            "scripts": [
+                "{{ user `dir_temp` }}/iso/PrepareFor-DiskOptimization.ps1",
+                "{{ user `dir_temp` }}/iso/Invoke-Defrag.ps1",
+                "{{ user `dir_temp` }}/iso/Invoke-DiskOptimization.ps1",
+                "{{ user `dir_temp` }}/iso/Invoke-SDelete.ps1"
+            ],
+            "type": "powershell"
+        }
+    ]
+}
