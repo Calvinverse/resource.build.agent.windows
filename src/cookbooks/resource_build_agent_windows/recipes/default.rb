@@ -11,6 +11,7 @@
 # Include the local recipes
 #
 
+include_recipe 'resource_build_agent_windows::filesystem'
 include_recipe 'resource_build_agent_windows::firewall'
 
 include_recipe 'resource_build_agent_windows::meta'
