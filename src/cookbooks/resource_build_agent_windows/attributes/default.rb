@@ -57,6 +57,18 @@ default['git']['url'] = 'https://github.com/git-for-windows/git/releases/downloa
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
 #
+# NUGET
+#
+
+default['nuget']['version'] = '4.7.0'
+default['nuget']['checksum'] = '0EABCC242D51D11A0E7BA07B7F1BC746B0E28D49C6C0FC03EDF715D252B03E13'
+default['nuget']['url'] = "https://dist.nuget.org/win-x86-commandline/v#{node['nuget']['version']}/nuget.exe"
+
+default['nuget']['path']['exe'] = "#{tools_path}/nuget"
+default['nuget']['path']['exe_file'] = "#{node['nuget']['path']['exe']}/nuget.exe"
+default['nuget']['path']['cache'] = 'e:/nuget'
+
+#
 # TELEGRAF
 #
 
