@@ -16,6 +16,8 @@ include_recipe 'resource_build_agent_windows::firewall'
 
 include_recipe 'resource_build_agent_windows::meta'
 
+include_recipe 'resource_build_agent_windows::java'
+
 include_recipe 'resource_build_agent_windows::git'
 include_recipe 'resource_build_agent_windows::nuget'
 include_recipe 'resource_build_agent_windows::provisioning'
