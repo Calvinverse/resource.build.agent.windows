@@ -5,6 +5,7 @@
 config_path = 'c:/config'
 logs_path = 'c:/logs'
 ops_path = 'c:/ops'
+secrets_path = 'c:/secrets'
 temp_path = 'c:/temp'
 tools_path = 'c:/tools'
 
@@ -22,6 +23,7 @@ default['consul_template']['template_path'] = "#{config_path}/#{node['consul_tem
 default['paths']['config'] = config_path
 default['paths']['logs'] = logs_path
 default['paths']['ops'] = ops_path
+default['paths']['secrets'] = secrets_path
 default['paths']['temp'] = temp_path
 default['paths']['tools'] = tools_path
 
@@ -68,6 +70,8 @@ default['jenkins']['service']['user_password'] = SecureRandom.uuid
 default['jenkins']['version'] = '3.13'
 default['jenkins']['checksum'] = '85197CCED609BB36EFC677813BCD3242813569970FF32BEF49A10EE6AD7FB630'
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
+
+default['jenkins']['path']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
 
 #
 # JOLOKIA

@@ -15,3 +15,10 @@ tools_directory = node['paths']['tools']
     rights :modify, 'Administrators', applies_to_children: true
   end
 end
+
+secrets_directory = node['paths']['secrets']
+directory secrets_directory do
+  action :create
+  inherits false
+  rights :modify, 'Administrators', applies_to_children: true
+end

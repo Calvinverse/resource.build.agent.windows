@@ -9,5 +9,9 @@ describe 'resource_build_agent_windows::filesystem' do
     it 'creates the tools directory' do
       expect(chef_run).to create_directory('c:/tools')
     end
+
+    it 'creates the secrets directory' do
+      expect(chef_run).to create_directory('c:/secrets')
+    end
   end
 end

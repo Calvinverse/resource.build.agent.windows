@@ -124,6 +124,12 @@ directory jenkins_logs_path do
   rights :modify, service_username, applies_to_children: true, applies_to_self: false
 end
 
+jenkins_secrets_path = "#{node['paths']['secrets']}/#{service_name}"
+directory jenkins_secrets_path do
+  action :create
+  rights :read_execute, service_username, applies_to_children: true, applies_to_self: false
+end
+
 #
 # INSTALL JENKINS SWARM SLAVE
 #
@@ -166,8 +172,7 @@ file "#{jenkins_bin_path}/#{service_exe_name}.exe.config" do
   XML
 end
 
-jolokia_agent_host = node['jolokia']['agent']['host']
-jolokia_agent_port = node['jolokia']['agent']['port']
+run_jenkins_script = "#{jenkins_bin_path}/Invoke-Jenkins.ps1"
 file "#{jenkins_bin_path}/#{service_exe_name}.xml" do
   content <<~XML
     <?xml version="1.0"?>
@@ -176,44 +181,15 @@ file "#{jenkins_bin_path}/#{service_exe_name}.xml" do
         <name>#{service_name}</name>
         <description>This service runs the jenkins build agent.</description>
 
-        <executable>java</executable>
+        <executable>powershell.exe</executable>
+        <argument>-NoLogo</argument>
+        <argument>-NonInteractive</argument>
+        <argument>-NoProfile</argument>
+        <argument>-File</argument>
+        <argument>"#{run_jenkins_script}"</argument>
+        <stoptimeout>30sec</stoptimeout>
 
-        <argument>-server</argument>
-
-        <argument>-XX:+AlwaysPreTouch</argument>
-
-        <argument>-XX:+UseConcMarkSweepGC</argument>
-        <argument>-XX:+ExplicitGCInvokesConcurrent</argument>
-        <argument>-XX:+ParallelRefProcEnabled</argument>
-        <argument>-XX:+UseStringDeduplication</argument>
-        <argument>-XX:+CMSParallelRemarkEnabled</argument>
-        <argument>-XX:+CMSIncrementalMode</argument>
-        <argument>-XX:CMSInitiatingOccupancyFraction=75</argument>
-
-        <argument>-Djava.awt.headless=true</argument>
-
-        <argument>-Djava.net.preferIPv4Stack=true</argument>
-
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-        <argument></argument>
-
-        <argument>-javaagent:#{jolokia_jar_path}=protocol=http,host=#{jolokia_agent_host},port=#{jolokia_agent_port},discoveryEnabled=false</argument>
-
-        <argument>-jar</argument>
-        <argument>#{swarm_slave_jar_path}</argument>
-
-        <logpath>#{consul_logs_path}</logpath>
+        <logpath>#{jenkins_logs_path}</logpath>
         <log mode="roll-by-size">
             <sizeThreshold>10240</sizeThreshold>
             <keepFiles>1</keepFiles>
@@ -256,18 +232,327 @@ end
 
 # Redirect user temp folder to cache drive
 
-# User to connect to the master? -> AD user that is controlled by vault?
-
 #
 # CONSUL-TEMPLATE
 #
 
+consul_template_config_path = node['consul_template']['config_path']
+consul_template_template_path = node['consul_template']['template_path']
+
+jenkins_password_file = "#{jenkins_secrets_path}/user.txt"
+jenkins_password_template_file = 'jenkins_swarm_password.hcl'
+file "#{consul_template_template_path}/#{jenkins_password_template_file}" do
+  content <<~TXT
+    {{ with secret "REPLACE/THIS/WITH/THE/USERPASSWORD" }}{{ if .Data.password }}{{ .Data.password }}{{ end }}{{ end }}
+  TXT
+  action :create
+end
+
+file "#{consul_template_config_path}/jenkins_password_file.hcl" do
+  action :create
+  content <<~HCL
+    # This block defines the configuration for a template. Unlike other blocks,
+    # this block may be specified multiple times to configure multiple templates.
+    # It is also possible to configure templates via the CLI directly.
+    template {
+      # This is the source file on disk to use as the input template. This is often
+      # called the "Consul Template template". This option is required if not using
+      # the `contents` option.
+      source = "#{consul_template_template_path}/#{jenkins_password_template_file}"
+
+      # This is the destination path on disk where the source template will render.
+      # If the parent directories do not exist, Consul Template will attempt to
+      # create them, unless create_dest_dirs is false.
+      destination = "#{jenkins_password_file}"
+
+      # This options tells Consul Template to create the parent directories of the
+      # destination path if they do not exist. The default value is true.
+      create_dest_dirs = false
+
+      # This is the optional command to run when the template is rendered. The
+      # command will only run if the resulting template changes. The command must
+      # return within 30s (configurable), and it must have a successful exit code.
+      # Consul Template is not a replacement for a process monitor or init system.
+      command = ""
+
+      # This is the maximum amount of time to wait for the optional command to
+      # return. Default is 30s.
+      command_timeout = "15s"
+
+      # Exit with an error when accessing a struct or map field/key that does not
+      # exist. The default behavior will print "<no value>" when accessing a field
+      # that does not exist. It is highly recommended you set this to "true" when
+      # retrieving secrets from Vault.
+      error_on_missing_key = false
+
+      # This is the permission to render the file. If this option is left
+      # unspecified, Consul Template will attempt to match the permissions of the
+      # file that already exists at the destination path. If no file exists at that
+      # path, the permissions are 0644.
+      perms = 0755
+
+      # This option backs up the previously rendered template at the destination
+      # path before writing a new one. It keeps exactly one backup. This option is
+      # useful for preventing accidental changes to the data without having a
+      # rollback strategy.
+      backup = true
+
+      # These are the delimiters to use in the template. The default is "{{" and
+      # "}}", but for some templates, it may be easier to use a different delimiter
+      # that does not conflict with the output file itself.
+      left_delimiter  = "{{"
+      right_delimiter = "}}"
+
+      # This is the `minimum(:maximum)` to wait before rendering a new template to
+      # disk and triggering a command, separated by a colon (`:`). If the optional
+      # maximum value is omitted, it is assumed to be 4x the required minimum value.
+      # This is a numeric time with a unit suffix ("5s"). There is no default value.
+      # The wait value for a template takes precedence over any globally-configured
+      # wait.
+      wait {
+        min = "2s"
+        max = "10s"
+      }
+    }
+  HCL
+  mode '755'
+end
+
+jolokia_agent_host = node['jolokia']['agent']['host']
+jolokia_agent_port = node['jolokia']['agent']['port']
+
+jenkins_run_script_template_file = node['jenkins']['path']['consul_template_run_script_file']
+file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
+  content <<~POWERSHELL
+    [CmdletBinding()]
+    param(
+    )
+
+    # =============================================================================
+
+    function Invoke-Script
+    {
+        $process = New-JenkinsProcess
+        while ($process -ne $null)
+        {
+            Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Jenkins connection values not available"
+            Start-Sleep -Seconds 5
+
+            $process = New-JenkinsProcess
+        }
+
+        while (-not (Test-Path "#{jenkins_password_file}"))
+        {
+            Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Connection credentials not available"
+            Start-Sleep -Seconds 5
+        }
+
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Starting jenkins ... "
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Using arguments: $($startInfo.Arguments)"
+
+        # Adding event handers for stdout and stderr.
+        $writeToFileEvent = {
+            if (-not ([String]::IsNullOrEmpty($EventArgs.Data)))
+            {
+                Out-File -FilePath $Event.MessageData -Append -InputObject $EventArgs.Data
+            }
+        }
+
+        $stdOutEvent = Register-ObjectEvent `
+          -InputObject $process `
+          -Action $writeToFileEvent `
+          -EventName 'OutputDataReceived' `
+          -MessageData '#{jenkins_logs_path}/jenkins.out.log'
+        $stdErrEvent = Register-ObjectEvent `
+          -InputObject $process `
+          -Action $writeToFileEvent `
+          -EventName 'ErrorDataReceived' `
+          -MessageData '#{jenkins_logs_path}/jenkins.err.log'
+
+        try
+        {
+            $process.Start() | Out-Null
+            try
+            {
+                $process.BeginOutputReadLine()
+                $process.BeginErrorReadLine()
+
+                while (-not ($process.HasExited))
+                {
+                    Start-Sleep -Seconds 5
+                }
+            }
+            finally
+            {
+                if (-not ($process.HasExited))
+                {
+                    $process.Close()
+                }
+            }
+        }
+        finally
+        {
+            Unregister-Event -SourceIdentifier $stdOutEvent.Name
+            Unregister-Event -SourceIdentifier $stdErrEvent.Name
+        }
+
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Jenkins stopped"
+    }
+
+    function New-JenkinsProcess
+    {
+        [CmdletBinding()]
+        param()
+
+    {{ if keyExists "config/services/consul/domain" }}
+    {{ if keyExists "config/services/builds/protocols/http/host" }}
+    {{ if keyExists "config/services/builds/protocols/http/port" }}
+    {{ if keyExists "config/environment/directory/query/groups/builds/agent" }}
+    {{ if keyExists "config/services/builds/protocols/http/virtualdirectory" }}
+        $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $startInfo.FileName = "java"
+        $startInfo.RedirectStandardOutput = $true
+        $startInfo.RedirectStandardError = $true
+        $startInfo.UseShellExecute = $false
+        $startInfo.CreateNoWindow = $true
+
+        $arguments = '-server'
+            + ' -XX:+AlwaysPreTouch'
+            + ' -XX:+UseConcMarkSweepGC'
+            + ' -XX:+ExplicitGCInvokesConcurrent'
+            + ' -XX:+ParallelRefProcEnabled'
+            + ' -XX:+UseStringDeduplication'
+            + ' -XX:+CMSParallelRemarkEnabled'
+            + ' -XX:+CMSIncrementalMode'
+            + ' -XX:CMSInitiatingOccupancyFraction=75'
+            + ' -Djava.net.preferIPv4Stack=true'
+            + ' -deleteExistingClients'
+            + ' -disableClientsUniqueId'
+            + ' -showHostName'
+            + " -executors $($env:NUMBER_OF_PROCESSORS)"
+            + ' -fsroot "#{jenkins_bin_path}"'
+            + ' -labelsFile "#{jenkins_label_file_path}"'
+            + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}'
+            + ' -mode EXCLUSIVE'
+            + ' -username {{ key "config/environment/directory/query/groups/builds/agent" }}'
+            + ' -passwordFile #{jenkins_password_file}'
+            + ' -javaagent:#{jolokia_jar_path}=protocol=http,host=#{jolokia_agent_host},port=#{jolokia_agent_port},discoveryEnabled=false'
+            + ' -jar #{swarm_slave_jar_path}'
+        $startInfo.Arguments = $arguments
+
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Starting jenkins ... "
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Using arguments: $($startInfo.Arguments)"
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $startInfo
+
+        return $process
+
+    {{ else }}
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/services/builds/protocols/http/virtualdirectory' not available. Will not start Jenkins."
+        return $null
+    {{ end }}
+    {{ else }}
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/environment/directory/query/groups/builds/agent' not available. Will not start Jenkins."
+        return $null
+    {{ end }}
+    {{ else }}
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/services/builds/protocols/http/port' not available. Will not start Jenkins."
+        return $null
+    {{ end }}
+    {{ else }}
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/services/builds/protocols/http/host' not available. Will not start Jenkins."
+        return $null
+    {{ end }}
+    {{ else }}
+        Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/services/consul/domain' not available. Will not start Jenkins."
+        return $null
+    {{ end }}
+    }
+
+    # =============================================================================
+
+    # Fire up
+    Invoke-Script
+
+    # Exit with a non-zero exit code so that the service never stops(?)
+    exit(1)
+  POWERSHELL
+  action :create
+end
+
+file "#{consul_template_config_path}/jenkins_service_configuration.hcl" do
+  action :create
+  content <<~HCL
+    # This block defines the configuration for a template. Unlike other blocks,
+    # this block may be specified multiple times to configure multiple templates.
+    # It is also possible to configure templates via the CLI directly.
+    template {
+      # This is the source file on disk to use as the input template. This is often
+      # called the "Consul Template template". This option is required if not using
+      # the `contents` option.
+      source = "#{consul_template_template_path}/#{jenkins_run_script_template_file}"
+
+      # This is the destination path on disk where the source template will render.
+      # If the parent directories do not exist, Consul Template will attempt to
+      # create them, unless create_dest_dirs is false.
+      destination = "#{run_jenkins_script}"
+
+      # This options tells Consul Template to create the parent directories of the
+      # destination path if they do not exist. The default value is true.
+      create_dest_dirs = false
+
+      # This is the optional command to run when the template is rendered. The
+      # command will only run if the resulting template changes. The command must
+      # return within 30s (configurable), and it must have a successful exit code.
+      # Consul Template is not a replacement for a process monitor or init system.
+      command = "powershell.exe -noprofile -nologo -noninteractive -command \\"Restart-Service #{service_name}\\" "
+
+      # This is the maximum amount of time to wait for the optional command to
+      # return. Default is 30s.
+      command_timeout = "15s"
+
+      # Exit with an error when accessing a struct or map field/key that does not
+      # exist. The default behavior will print "<no value>" when accessing a field
+      # that does not exist. It is highly recommended you set this to "true" when
+      # retrieving secrets from Vault.
+      error_on_missing_key = false
+
+      # This is the permission to render the file. If this option is left
+      # unspecified, Consul Template will attempt to match the permissions of the
+      # file that already exists at the destination path. If no file exists at that
+      # path, the permissions are 0644.
+      perms = 0755
+
+      # This option backs up the previously rendered template at the destination
+      # path before writing a new one. It keeps exactly one backup. This option is
+      # useful for preventing accidental changes to the data without having a
+      # rollback strategy.
+      backup = true
+
+      # These are the delimiters to use in the template. The default is "{{" and
+      # "}}", but for some templates, it may be easier to use a different delimiter
+      # that does not conflict with the output file itself.
+      left_delimiter  = "{{"
+      right_delimiter = "}}"
+
+      # This is the `minimum(:maximum)` to wait before rendering a new template to
+      # disk and triggering a command, separated by a colon (`:`). If the optional
+      # maximum value is omitted, it is assumed to be 4x the required minimum value.
+      # This is a numeric time with a unit suffix ("5s"). There is no default value.
+      # The wait value for a template takes precedence over any globally-configured
+      # wait.
+      wait {
+        min = "2s"
+        max = "10s"
+      }
+    }
+  HCL
+  mode '755'
+end
+
 #
 # CONSUL-TEMPLATE FILES FOR TELEGRAF
 #
-
-consul_template_config_path = node['consul_template']['config_path']
-consul_template_template_path = node['consul_template']['template_path']
 
 jolokia_agent_context = node['jolokia']['agent']['context']
 
