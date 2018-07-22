@@ -14,6 +14,7 @@ tools_path = 'c:/tools'
 # CONSULTEMPLATE
 #
 
+default['consul_template']['service']['name'] = 'consul-template'
 default['consul_template']['config_path'] = "#{config_path}/#{node['consul_template']['service']['name']}/config"
 default['consul_template']['template_path'] = "#{config_path}/#{node['consul_template']['service']['name']}/templates"
 
@@ -140,6 +141,7 @@ default['nuget']['path']['cache'] = 'e:/nuget'
 # TELEGRAF
 #
 
+default['telegraf']['service']['name'] = 'telegraf'
 default['telegraf']['config_directory'] = "#{config_path}/#{node['telegraf']['service']['name']}"
 
 #

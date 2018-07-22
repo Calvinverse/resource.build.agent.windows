@@ -12,7 +12,7 @@
 #
 
 npm_cache_path = node['npm']['path']['cache']
-directory path do
+directory npm_cache_path do
   action :create
   rights :modify, 'Everyone', applies_to_children: true, applies_to_self: false
 end
@@ -92,4 +92,17 @@ powershell_script 'install_npm' do
 
     npm install -g npm@#{node['npm']['version']}
   POWERSHELL
+end
+
+#
+# ADD TO THE JENKINS LABELS FILE
+#
+
+jenkins_labels_file = node['jenkins']['file']['labels_file']
+ruby_block 'add_nodejs_label' do
+  block do
+    file = Chef::Util::FileEdit.new(jenkins_labels_file)
+    file.insert_line_if_no_match('nodejs', 'nodejs')
+    file.write_file
+  end
 end

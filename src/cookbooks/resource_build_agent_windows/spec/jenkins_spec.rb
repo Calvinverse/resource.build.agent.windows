@@ -43,7 +43,7 @@ describe 'resource_build_agent_windows::jenkins' do
     end
 
     it 'creates jolokia.jar in the consul ops directory' do
-      expect(chef_run).to create_remote_file("#{jenkins_bin_path}/jolokia.jar")
+      expect(chef_run).to create_remote_file("#{jolokia_bin_path}/jolokia.jar")
     end
   end
 
@@ -66,7 +66,7 @@ describe 'resource_build_agent_windows::jenkins' do
   context 'install jenkins as service' do
     let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
-    win_service_name = 'jenkins'
+    win_service_name = 'jenkins_service'
     it 'downloads the winsw file' do
       expect(chef_run).to create_remote_file("#{jenkins_bin_path}/#{win_service_name}.exe")
     end
@@ -146,7 +146,7 @@ describe 'resource_build_agent_windows::jenkins' do
         .with_content(password_template_content)
     end
 
-    consul_template_filebeat_content = <<~CONF
+    consul_template_jenkins_secrets_content = <<~CONF
       # This block defines the configuration for a template. Unlike other blocks,
       # this block may be specified multiple times to configure multiple templates.
       # It is also possible to configure templates via the CLI directly.
@@ -211,9 +211,9 @@ describe 'resource_build_agent_windows::jenkins' do
         }
       }
     CONF
-    it 'creates filebeat.hcl in the consul-template template directory' do
-      expect(chef_run).to create_file('c:/config/consul-template/config/filebeat.hcl')
-        .with_content(consul_template_filebeat_content)
+    it 'creates jenkins_password_file.hcl in the consul-template template directory' do
+      expect(chef_run).to create_file('c:/config/consul-template/config/jenkins_password_file.hcl')
+        .with_content(consul_template_jenkins_secrets_content)
     end
 
     jenkins_start_script_content = <<~POWERSHELL
@@ -533,7 +533,7 @@ describe 'resource_build_agent_windows::jenkins' do
         # This is the destination path on disk where the source template will render.
         # If the parent directories do not exist, Consul Template will attempt to
         # create them, unless create_dest_dirs is false.
-        destination = "c:/config/telegraf/system_metrics.conf"
+        destination = "c:/config/telegraf/inputs_jolokia.conf"
 
         # This options tells Consul Template to create the parent directories of the
         # destination path if they do not exist. The default value is true.

@@ -18,7 +18,7 @@ directory nuget_bin_path do
 end
 
 nuget_cache_path = node['nuget']['path']['cache']
-directory path do
+directory nuget_cache_path do
   action :create
   rights :modify, 'Everyone', applies_to_children: true, applies_to_self: false
 end
@@ -48,3 +48,16 @@ end
 # Default NuGet config file
 
 # NuGet credential provider that links to Vault
+
+#
+# ADD TO THE JENKINS LABELS FILE
+#
+
+jenkins_labels_file = node['jenkins']['file']['labels_file']
+ruby_block 'add_nuget_label' do
+  block do
+    file = Chef::Util::FileEdit.new(jenkins_labels_file)
+    file.insert_line_if_no_match('nuget', 'nuget')
+    file.write_file
+  end
+end

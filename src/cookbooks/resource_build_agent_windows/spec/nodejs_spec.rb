@@ -64,4 +64,12 @@ describe 'resource_build_agent_windows::nodejs' do
       expect(chef_run).to run_powershell_script('install_npm')
     end
   end
+
+  context 'adds a label to the jenkins label file' do
+    let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+
+    it 'adds the nodejs label' do
+      expect(chef_run).to run_ruby_block('add_nodejs_label')
+    end
+  end
 end

@@ -25,32 +25,25 @@ msbuild_install_options =
   ' --noUpdateInstaller'
 
 # Add the Azure build tools
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended'
 
 # Add the desktop build tools
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended'
 
 # Add MsBuild
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.MSBuildTools'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.MSBuildTools'
 
 # Add the .NET core 2.0 build tools
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools'
 
 # Add the C++ build tools
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.VCTools'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.VCTools'
 
 # Add the Web build tools
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended'
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended'
 
 # Additionally add the components for the 4.7.1 runtime
-msbuild_install_options = msbuild_install_options \
-  ' -add Microsoft.Net.Component.4.7.1.SDK' \
+msbuild_install_options = msbuild_install_options << ' -add Microsoft.Net.Component.4.7.1.SDK' \
   ' -add Microsoft.Net.Component.4.7.1.TargetingPack' \
   ' -add Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools'
 
@@ -67,4 +60,17 @@ end
 
 windows_path 'C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/amd64' do
   action :add
+end
+
+#
+# ADD TO THE JENKINS LABELS FILE
+#
+
+jenkins_labels_file = node['jenkins']['file']['labels_file']
+ruby_block 'add_msbuild_label' do
+  block do
+    file = Chef::Util::FileEdit.new(jenkins_labels_file)
+    file.insert_line_if_no_match('msbuild', 'msbuild')
+    file.write_file
+  end
 end

@@ -30,4 +30,12 @@ describe 'resource_build_agent_windows::nuget' do
       expect(chef_run).to create_env('NUGET_PACKAGES').with_value('e:/nuget')
     end
   end
+
+  context 'adds a label to the jenkins label file' do
+    let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+
+    it 'adds the nuget label' do
+      expect(chef_run).to run_ruby_block('add_nuget_label')
+    end
+  end
 end
