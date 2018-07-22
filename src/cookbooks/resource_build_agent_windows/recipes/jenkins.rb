@@ -7,7 +7,6 @@
 # Copyright 2018, P. van der Velde
 #
 
-
 # Configure the service user under which telegraf will be run
 service_username = node['jenkins']['service']['user_name']
 service_password = node['jenkins']['service']['user_password']

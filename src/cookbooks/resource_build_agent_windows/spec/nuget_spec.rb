@@ -11,7 +11,7 @@ describe 'resource_build_agent_windows::nuget' do
     end
 
     it 'creates nuget.exe in the nuget tools directory' do
-      expect(chef_run).to create_remote_file("c:/tools/nuget/nuget.exe")
+      expect(chef_run).to create_remote_file('c:/tools/nuget/nuget.exe')
     end
 
     it 'adds nuget to the path' do

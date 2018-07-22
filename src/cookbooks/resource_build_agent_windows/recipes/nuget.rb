@@ -46,4 +46,5 @@ env 'NUGET_PACKAGES' do
 end
 
 # Default NuGet config file
+
 # NuGet credential provider that links to Vault

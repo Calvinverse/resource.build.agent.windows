@@ -11,8 +11,8 @@ describe 'resource_build_agent_windows::meta' do
     end
 
     it 'sets the RESOURCE_SHORT_NAME environment variable' do
-        expect(chef_run).to create_env('RESOURCE_SHORT_NAME')
-      end
+      expect(chef_run).to create_env('RESOURCE_SHORT_NAME')
+    end
 
     it 'sets the RESOURCE_VERSION_MAJOR environment variable' do
       expect(chef_run).to create_env('RESOURCE_VERSION_MAJOR')

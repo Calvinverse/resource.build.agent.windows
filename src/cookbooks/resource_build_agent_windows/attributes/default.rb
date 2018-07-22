@@ -57,7 +57,7 @@ default['firewall']['paths']['logs'] = "#{logs_path}/firewall"
 default['git']['version'] = '2.18.0'
 default['git']['architecture'] = '64'
 default['git']['checksum'] = 'aa81c9f2a81fd07ba0582095474365821880fd787b1cbe03abaf71d9aa69d359'
-default['git']['url'] = 'https://github.com/git-for-windows/git/releases/download/v%{version}.windows.1/Git-%{version}-%{architecture}-bit.exe'
+default['git']['url'] = "https://github.com/git-for-windows/git/releases/download/v#{node['git']['version']}.windows.1/Git-#{node['git']['version']}-#{node['git']['architecture']}-bit.exe"
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
 #
@@ -110,15 +110,15 @@ default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.
 # NODE / NPM
 #
 
-default['node']['path']['base'] = "#{languages_path}/node"
-default['node']['version'] = "8.11.3"
+default['nodejs']['path']['base'] = "#{languages_path}/node"
+default['nodejs']['version'] = '8.11.3'
 
 default['nvm']['version'] = '1.1.6'
 default['nvm']['checksum'] = '975697D7A3AB697060FE71FFBB37DBA7FF2120295EAD3E75799F935CA7403135'
 default['nvm']['url'] = "https://github.com/coreybutler/nvm-windows/releases/download/#{node['nvm']['version']}/nvm-noinstall.zip"
 
-default['nvm']['path']['bin'] = "#{node['node']['path']['base']}/nvm"
-default['nvm']['path']['symlink'] = "#{node['node']['path']['base']}/nodejs"
+default['nvm']['path']['bin'] = "#{node['nodejs']['path']['base']}/nvm"
+default['nvm']['path']['symlink'] = "#{node['nodejs']['path']['base']}/nodejs"
 default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
 default['npm']['version'] = '6.1.0'

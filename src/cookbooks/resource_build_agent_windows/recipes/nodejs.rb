@@ -21,12 +21,11 @@ env 'npm_config_cache' do
   value npm_cache_path
 end
 
-
 #
 # INSTALL NVM
 #
 
-node_base_directory = node['node']['path']['base']
+node_base_directory = node['nodejs']['path']['base']
 directory node_base_directory do
   action :create
 end
@@ -78,8 +77,8 @@ powershell_script 'install_node' do
   code <<-POWERSHELL
     $ErrorActionPreference = 'Stop'
 
-    nvm install #{node['node']['version']}
-    nvm use #{node['node']['version']}
+    nvm install #{node['nodejs']['version']}
+    nvm use #{node['nodejs']['version']}
   POWERSHELL
 end
 
