@@ -7,8 +7,9 @@
 # Copyright 2018, P. van der Velde
 #
 
+languages_directory = node['paths']['languages']
 tools_directory = node['paths']['tools']
-%W[#{tools_directory}].each do |path|
+%W[#{languages_directory} #{tools_directory}].each do |path|
   directory path do
     action :create
     rights :read, 'Everyone', applies_to_children: true

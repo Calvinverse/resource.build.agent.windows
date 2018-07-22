@@ -7,6 +7,10 @@ describe 'resource_build_agent_windows::filesystem' do
     let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
     it 'creates the tools directory' do
+      expect(chef_run).to create_directory('c:/languages')
+    end
+
+    it 'creates the tools directory' do
       expect(chef_run).to create_directory('c:/tools')
     end
 

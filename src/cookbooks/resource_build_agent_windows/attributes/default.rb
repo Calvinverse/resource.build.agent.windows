@@ -3,6 +3,7 @@
 # Variables
 
 config_path = 'c:/config'
+languages_path = 'c:/languages'
 logs_path = 'c:/logs'
 ops_path = 'c:/ops'
 secrets_path = 'c:/secrets'
@@ -21,6 +22,7 @@ default['consul_template']['template_path'] = "#{config_path}/#{node['consul_tem
 #
 
 default['paths']['config'] = config_path
+default['paths']['languages'] = languages_path
 default['paths']['logs'] = logs_path
 default['paths']['ops'] = ops_path
 default['paths']['secrets'] = secrets_path
@@ -103,6 +105,24 @@ default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepa
 #
 
 default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.exe'
+
+#
+# NODE / NPM
+#
+
+default['node']['path']['base'] = "#{languages_path}/node"
+default['node']['version'] = "8.11.3"
+
+default['nvm']['version'] = '1.1.6'
+default['nvm']['checksum'] = '975697D7A3AB697060FE71FFBB37DBA7FF2120295EAD3E75799F935CA7403135'
+default['nvm']['url'] = "https://github.com/coreybutler/nvm-windows/releases/download/#{node['nvm']['version']}/nvm-noinstall.zip"
+
+default['nvm']['path']['bin'] = "#{node['node']['path']['base']}/nvm"
+default['nvm']['path']['symlink'] = "#{node['node']['path']['base']}/nodejs"
+default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
+
+default['npm']['version'] = '6.1.0'
+default['npm']['path']['cache'] = 'e:/npm'
 
 #
 # NUGET
