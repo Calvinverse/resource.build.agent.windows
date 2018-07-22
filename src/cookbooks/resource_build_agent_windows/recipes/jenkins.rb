@@ -35,7 +35,7 @@ end
 
 # Grant the user the LogOnAsService permission. Following this anwer on SO: http://stackoverflow.com/a/21235462/539846
 # With some additional bug fixes to get the correct line from the export file and to put the correct text in the import file
-powershell_script 'telegraf_user_grant_service_logon_rights' do
+powershell_script 'jenkins_user_grant_service_logon_rights' do
   code <<~POWERSHELL
     $ErrorActionPreference = 'Stop'
 
@@ -114,7 +114,9 @@ jolokia_bin_path = node['jolokia']['path']['jar']
 %W[#{jenkins_bin_path} #{jolokia_bin_path}].each do |path|
   directory path do
     action :create
-    rights :read_execute, 'Everyone', applies_to_children: true, applies_to_self: false
+    inherits false
+    rights :read_execute, service_username, applies_to_children: true, applies_to_self: true
+    rights :full_control, 'Administrators', applies_to_children: true
   end
 end
 
@@ -127,7 +129,9 @@ end
 jenkins_secrets_path = "#{node['paths']['secrets']}/#{service_name}"
 directory jenkins_secrets_path do
   action :create
+  inherits false
   rights :read_execute, service_username, applies_to_children: true, applies_to_self: false
+  rights :full_control, 'Administrators', applies_to_children: true
 end
 
 #
@@ -139,6 +143,10 @@ swarm_slave_jar_path = "#{jenkins_bin_path}/#{swarm_slave_jar}"
 remote_file swarm_slave_jar_path do
   action :create
   source node['jenkins']['url']['jar']
+end
+
+env 'JENKINS_HOME' do
+  value jenkins_bin_path
 end
 
 #
@@ -226,11 +234,41 @@ powershell_script 'jenkins_as_service' do
   POWERSHELL
 end
 
-# Labels file
+#
+# NODE LABELS
+#
 
-# Create junction to workspace and redirect to workspace drive
+jenkins_labels_file = node['jenkins']['file']['labels_file']
+jenkins_label_file_path = "#{jenkins_bin_path}/#{jenkins_labels_file}"
+file jenkins_label_file_path do
+  action :create
+  content <<~TXT
+    windows
+    windows_2016
+    powershell
+  TXT
+end
 
-# Redirect user temp folder to cache drive
+#
+# WORKSPACE SYMBOLIC LINK
+#
+
+# NOTE: this assumes that the workspace drive has the label 'workspace' as set in the packer config
+# file. If you change the drive label, you have to change the script below as well.
+powershell_script 'workspace_symbolic_link' do
+  code <<-POWERSHELL
+    $ErrorActionPreference = 'Stop'
+
+    $workspaceDrive = Get-Volume -FileSystemLabel 'workspace'
+    $workspaceDriveLetter = $workspaceDrive.DriveLetter
+
+    $workspaceDirectory = '#{jenkins_bin_path}/workspace'
+    if (-not (Test-Path $workspaceDirectory))
+    {
+        New-Item -Path $workspaceDirectory -ItemType SymbolicLink -Value "$($workspaceDriveLetter):"
+    }
+  POWERSHELL
+end
 
 #
 # CONSUL-TEMPLATE
@@ -240,12 +278,12 @@ consul_template_config_path = node['consul_template']['config_path']
 consul_template_template_path = node['consul_template']['template_path']
 
 jenkins_password_file = "#{jenkins_secrets_path}/user.txt"
-jenkins_password_template_file = 'jenkins_swarm_password.hcl'
+jenkins_password_template_file = 'jenkins_swarm_password.ctmpl'
 file "#{consul_template_template_path}/#{jenkins_password_template_file}" do
-  content <<~TXT
-    {{ with secret "REPLACE/THIS/WITH/THE/USERPASSWORD" }}{{ if .Data.password }}{{ .Data.password }}{{ end }}{{ end }}
-  TXT
   action :create
+  content <<~TXT
+    {{ with secret "secret/environment/directory/users/build/agent" }}{{ if .Data.password }}{{ .Data.password }}{{ end }}{{ end }}
+  TXT
 end
 
 file "#{consul_template_config_path}/jenkins_password_file.hcl" do
@@ -321,7 +359,7 @@ end
 jolokia_agent_host = node['jolokia']['agent']['host']
 jolokia_agent_port = node['jolokia']['agent']['port']
 
-jenkins_run_script_template_file = node['jenkins']['path']['consul_template_run_script_file']
+jenkins_run_script_template_file = node['jenkins']['file']['consul_template_run_script_file']
 file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
   content <<~POWERSHELL
     [CmdletBinding()]
@@ -425,6 +463,8 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -XX:+CMSParallelRemarkEnabled'
             + ' -XX:+CMSIncrementalMode'
             + ' -XX:CMSInitiatingOccupancyFraction=75'
+            + ' -Xmx500m'
+            + ' -Xms500m'
             + ' -Djava.net.preferIPv4Stack=true'
             + ' -deleteExistingClients'
             + ' -disableClientsUniqueId'

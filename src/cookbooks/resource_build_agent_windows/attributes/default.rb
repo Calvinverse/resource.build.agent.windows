@@ -71,7 +71,8 @@ default['jenkins']['version'] = '3.13'
 default['jenkins']['checksum'] = '85197CCED609BB36EFC677813BCD3242813569970FF32BEF49A10EE6AD7FB630'
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
 
-default['jenkins']['path']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
+default['jenkins']['file']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
+default['jenkins']['file']['labels_file'] = 'labels.txt'
 
 #
 # JOLOKIA
