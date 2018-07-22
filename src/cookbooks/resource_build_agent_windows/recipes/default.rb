@@ -24,8 +24,6 @@ include_recipe 'resource_build_agent_windows::gpg'
 include_recipe 'resource_build_agent_windows::nuget'
 
 include_recipe 'resource_build_agent_windows::net_build_tools'
-include_recipe 'resource_build_agent_windows::net_core_build_tools'
-
 include_recipe 'resource_build_agent_windows::nodejs'
 
 

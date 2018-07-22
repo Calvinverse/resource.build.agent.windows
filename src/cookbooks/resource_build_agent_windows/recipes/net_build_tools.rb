@@ -6,3 +6,65 @@
 #
 # Copyright 2018, P. van der Velde
 #
+
+#
+# VISUAL STUDIO BUILD TOOLS
+#
+
+# Use the following standard options:
+# - quiet: Don't show a UI or progress bar
+# - norestart: Don't restart even if that is required
+# - wait: wait for the installation to be done
+# - nocache: Don't cache components, they will be downloaded again next time
+# - noUpdateInstaller: Don't update the installer
+msbuild_install_options =
+  '--quiet' \
+  ' --norestart' \
+  ' --wait' \
+  ' --nocache' \
+  ' --noUpdateInstaller'
+
+# Add the Azure build tools
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended'
+
+# Add the desktop build tools
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended'
+
+# Add MsBuild
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.MSBuildTools'
+
+# Add the .NET core 2.0 build tools
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools'
+
+# Add the C++ build tools
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.VCTools'
+
+# Add the Web build tools
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended'
+
+# Additionally add the components for the 4.7.1 runtime
+msbuild_install_options = msbuild_install_options \
+  ' -add Microsoft.Net.Component.4.7.1.SDK' \
+  ' -add Microsoft.Net.Component.4.7.1.TargetingPack' \
+  ' -add Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools'
+
+windows_package 'MsBuild' do
+  action :install
+  installer_type :custom
+  options msbuild_install_options
+  source node['net_build_tools']['url']
+end
+
+#
+# ADD MSBUILD TO THE PATH
+#
+
+windows_path 'C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/amd64' do
+  action :add
+end

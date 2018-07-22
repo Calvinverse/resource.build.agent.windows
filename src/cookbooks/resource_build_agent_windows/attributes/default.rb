@@ -99,6 +99,12 @@ default['jolokia']['checksum'] = '40123D4728CB62BF7D4FD3C8DE7CF3A0F955F89453A645
 default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/#{node['jolokia']['version']}/jolokia-jvm-#{node['jolokia']['version']}-agent.jar"
 
 #
+# .NET BUILD TOOLS
+#
+
+default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.exe'
+
+#
 # NUGET
 #
 
