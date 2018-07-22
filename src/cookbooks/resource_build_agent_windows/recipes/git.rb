@@ -8,3 +8,11 @@
 #
 
 include_recipe 'git::windows'
+
+#
+# ADD GIT TO THE PATH
+#
+
+windows_path 'c:/Progam Files/Git/cmd' do
+  action :add
+end

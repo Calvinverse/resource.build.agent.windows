@@ -9,5 +9,9 @@ describe 'resource_build_agent_windows::git' do
     it 'imports the git::windows recipe' do
       expect(chef_run).to include_recipe('git::windows')
     end
+
+    it 'adds git to the path' do
+      expect(chef_run).to add_windows_path('c:/Program Files/Git/cmd')
+    end
   end
 end
