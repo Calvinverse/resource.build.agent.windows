@@ -26,5 +26,6 @@ include_recipe 'resource_build_agent_windows::nuget'
 include_recipe 'resource_build_agent_windows::net_build_tools'
 include_recipe 'resource_build_agent_windows::nodejs'
 
+include_recipe 'resource_build_agent_windows::build_scripts'
 
 include_recipe 'resource_build_agent_windows::provisioning'
