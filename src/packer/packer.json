@@ -117,14 +117,12 @@
             "inline": "& c:\\temp_dvd\\chefservice.exe -install ",
             "type": "powershell"
         },
-
         {
             "elevated_password": "{{ user `admin_password` }}",
             "elevated_user": "{{ user `admin_username` }}",
             "inline": "& c:\\temp_dvd\\eis-chef.exe --local-mode --config c:\\temp_dvd\\client.rb --override-runlist \"{{ user `cookbook_name` }}::default\" --log-level info ",
             "type": "powershell"
         },
-
         {
             "elevated_password": "{{ user `admin_password` }}",
             "elevated_user": "{{ user `admin_username` }}",
@@ -147,18 +145,26 @@
         },
 
         {
-            "inline": "Remove-Item c:/config/unbound/unbound_zones.conf -Force",
+            "elevated_password": "{{ user `admin_password` }}",
+            "elevated_user": "{{ user `admin_username` }}",
+            "inline": "Remove-Item -Path c:/temp_dvd -Recurse -Force",
             "type": "powershell"
         },
-
         {
-            "elevated_user": "{{user `admin_username`}}",
+            "env_var_format": "$env:%s=\"%s\"; ",
+            "execute_command" : ["powershell.exe", "{{.Vars}} {{.Script}}"],
+            "inline": ["{{ user `dir_scripts_user` }}/Copy-LogFilesFromVm.ps1 -vmName {{ user `vm_name` }} -userName {{ user `admin_username` }} -userPassword {{ user `admin_password` }} -targetDirectory {{ user `dir_log` }}/packer.beforesysprep"],
+            "tempfile_extension": ".ps1",
+            "type": "shell-local"
+        },
+        {
             "elevated_password": "{{user `admin_password`}}",
+            "elevated_user": "{{user `admin_username`}}",
             "scripts": [
-                "{{ user `dir_temp` }}/iso/PrepareFor-DiskOptimization.ps1",
-                "{{ user `dir_temp` }}/iso/Invoke-Defrag.ps1",
-                "{{ user `dir_temp` }}/iso/Invoke-DiskOptimization.ps1",
-                "{{ user `dir_temp` }}/iso/Invoke-SDelete.ps1"
+                "{{ user `dir_scripts_user` }}/PrepareFor-DiskOptimization.ps1",
+                "{{ user `dir_scripts_user` }}/Invoke-Defrag.ps1",
+                "{{ user `dir_scripts_user` }}/Invoke-DiskOptimization.ps1",
+                "{{ user `dir_scripts_user` }}/Invoke-SDelete.ps1"
             ],
             "type": "powershell"
         }
