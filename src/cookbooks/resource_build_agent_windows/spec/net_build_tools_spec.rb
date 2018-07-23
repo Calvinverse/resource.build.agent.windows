@@ -24,7 +24,7 @@ describe 'resource_build_agent_windows::net_build_tools' do
 
     it 'installs the .NET build tools' do
       expect(chef_run).to install_windows_package('MsBuild').with(
-        installer_type: custom,
+        installer_type: :custom,
         options: msbuild_install_options,
         source: 'https://aka.ms/vs/15/release/vs_buildtools.exe'
       )

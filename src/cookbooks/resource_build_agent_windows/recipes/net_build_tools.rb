@@ -22,28 +22,14 @@ msbuild_install_options =
   ' --norestart' \
   ' --wait' \
   ' --nocache' \
-  ' --noUpdateInstaller'
-
-# Add the Azure build tools
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended'
-
-# Add the desktop build tools
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended'
-
-# Add MsBuild
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.MSBuildTools'
-
-# Add the .NET core 2.0 build tools
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools'
-
-# Add the C++ build tools
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.VCTools'
-
-# Add the Web build tools
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended'
-
-# Additionally add the components for the 4.7.1 runtime
-msbuild_install_options = msbuild_install_options << ' -add Microsoft.Net.Component.4.7.1.SDK' \
+  ' --noUpdateInstaller' \
+  ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended' \
+  ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended' \
+  ' -add Microsoft.VisualStudio.Workload.MSBuildTools' \
+  ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools' \
+  ' -add Microsoft.VisualStudio.Workload.VCTools' \
+  ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended' \
+  ' -add Microsoft.Net.Component.4.7.1.SDK' \
   ' -add Microsoft.Net.Component.4.7.1.TargetingPack' \
   ' -add Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools'
 
