@@ -238,8 +238,7 @@ end
 #
 
 jenkins_labels_file = node['jenkins']['file']['labels_file']
-jenkins_label_file_path = "#{jenkins_bin_path}/#{jenkins_labels_file}"
-file jenkins_label_file_path do
+file jenkins_labels_file do
   action :create
   content <<~TXT
     windows
