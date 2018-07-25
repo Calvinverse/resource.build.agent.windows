@@ -25,10 +25,6 @@ powershell_script 'jenkins_user_with_password_that_does_not_expire' do
       -UserMayNotChangePassword `
       -AccountNeverExpires `
       -Verbose
-
-    Add-LocalGroupMember `
-      -Member $localUser.Name `
-      -Verbose
   POWERSHELL
 end
 
