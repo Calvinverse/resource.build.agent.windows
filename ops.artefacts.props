@@ -123,13 +123,11 @@
         The item group defining the location and contents of the ISO files that are generated during the build
         All file paths allow build templates, e.g. $(DirBuildDeploy)\myarchive-${VersionSemantic}.zip.
     -->
-    <ItemGroup Condition=" '$(ShouldLoadIsoPackageSpecs)' == 'true' ">
-        <!--
+    <ItemGroup>
         <IsoPackageSpecs
-            Condition=" '$(DirWorkspace)' != '' "
-            Exclude="$(DirBuild)\**\*.isospec"
-            Include="$(DirWorkspace)\**\*.isospec" />
-        -->
+            Condition=" '$(IsBuild)' == 'true' "
+            Include="$(DirSrc)\**\*.isospec"
+            Exclude="$(DirBuild)\**\*.isospec" />
     </ItemGroup>
 
 
