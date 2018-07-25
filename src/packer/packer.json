@@ -7,8 +7,10 @@
 
         "dir_cookbooks_src": "src/cookbooks",
         "dir_cookbooks_vendors": "packages/vendor/cookbooks",
-        "dir_http_user": null,
+        "dir_deploy": null,
+        "dir_log": null,
         "dir_src_provisioning": "src/provisioning",
+        "dir_scripts_user": null,
         "dir_temp": null,
         "dir_vm_import": null,
 
@@ -23,7 +25,7 @@
             "boot_wait": "5s",
             "boot_command": [],
             "clone_from_vmxc_path": "{{ user `dir_vm_import` }}",
-            "communicator": "ssh",
+            "communicator": "winrm",
             "enable_dynamic_memory": false,
             "enable_mac_spoofing": false,
             "enable_secure_boot": false,
@@ -31,21 +33,24 @@
             "generation": 2,
             "guest_additions_mode": "disable",
             "headless": true,
-            "http_directory": "{{ user `dir_http_user` }}",
             "http_port_min": 8150,
             "http_port_max": 8160,
             "output_directory": "{{ user `dir_temp` }}/{{ user `vm_name` }}",
             "ram_size": "{{ user `vm_ram_size_in_mb` }}",
-            "shutdown_command": "echo '{{user `admin_password`}}' | sudo -S -E shutdown -P now",
-            "shutdown_timeout": "5m",
+            "secondary_iso_images": [
+                "{{ user `dir_deploy` }}/windows.iso"
+            ],
+            "shutdown_command": "IF EXIST a:\\run-sysprep.cmd (CALL a:\\run-sysprep.cmd) ELSE (IF EXIST e:\\run-sysprep.cmd (CALL e:\\run-sysprep.cmd) ELSE (CALL f:\\run-sysprep.cmd)) &IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
+            "shutdown_timeout": "20m",
             "skip_compaction": false,
-            "ssh_password": "{{user `admin_password`}}",
-            "ssh_timeout": "4h",
-            "ssh_username": "{{user `admin_username`}}",
-            "switch_name": "{{user `vm_switch_name`}}",
+            "switch_name": "{{ user `vm_switch_name` }}",
+            "switch_vlan_id": "{{ user `vm_switch_vlan` }}",
             "type": "hyperv-vmcx",
             "vlan_id": "{{ user `vm_switch_vlan` }}",
-            "vm_name": "{{ user `vm_name` }}"
+            "vm_name": "{{ user `vm_name` }}",
+            "winrm_password": "{{ user `admin_password` }}",
+            "winrm_timeout": "2h",
+            "winrm_username": "{{ user `admin_username` }}"
         }
     ],
     "provisioners": [
@@ -61,11 +66,11 @@
         },
 
         {
-            "inline": "New-Item -Path c:/temp_dvd -ItemType Directory; $drive = 'd:'; if (Test-Path 'e:/client.rb') { $drive = 'e:'} else { if (Test-Path 'f:/client.rb') { $drive = 'f:'} }; Copy-Item \"$($drive)/*\" c:/temp_dvd -Recurse",
+            "inline": "$ErrorActionPreference = 'Stop'; $dvdDrive = Get-WmiObject -Class Win32_Volume -Filter \"DriveType=5\"; if ($dvdDrive -ne $null) { $dvdDriveLetter = $dvdDrive | Select-Object -ExpandProperty DriveLetter; if (-not (Test-Path -Path 'f:')) { $dvdDrive | Set-WmiInstance -Arguments @{ DriveLetter='f:'} } }",
             "type": "powershell"
         },
         {
-            "inline": "$dvdDrive = Get-WmiObject -Class Win32_Volume -Filter \"DriveType=5\"; if ($dvdDrive -ne $null) { $dvdDriveLetter = $dvdDrive | Select-Object -ExpandProperty DriveLetter; if (-not (Test-Path -Path 'f:')) { $dvdDrive | Set-WmiInstance -Arguments @{ DriveLetter='f:'} }",
+            "inline": "$ErrorActionPreference = 'Stop'; New-Item -Path c:/temp_dvd -ItemType Directory; $drive = 'd:'; if (Test-Path 'e:/client.rb') { $drive = 'e:'} else { if (Test-Path 'f:/client.rb') { $drive = 'f:'} }; Copy-Item \"$($drive)/*\" c:/temp_dvd -Recurse",
             "type": "powershell"
         },
 
@@ -79,8 +84,8 @@
             "env_var_format": "$env:%s=\"%s\"; ",
             "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": [
-                "New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/workspace.vhdx' -SizeBytes 100GB",
-                "Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/workspace.vhdx'"
+                "$ErrorActionPreference = 'Stop'; New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/workspace.vhdx' -SizeBytes 100GB",
+                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/workspace.vhdx'"
             ],
             "tempfile_extension": ".ps1",
             "type": "shell-local"
@@ -94,14 +99,14 @@
             "env_var_format": "$env:%s=\"%s\"; ",
             "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": [
-                "New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/cache.vhdx' -SizeBytes 50GB -BlockSizeBytes 1MB",
-                "Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/cache.vhdx'"
+                "$ErrorActionPreference = 'Stop'; New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/cache.vhdx' -SizeBytes 50GB -BlockSizeBytes 1MB",
+                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/cache.vhdx'"
             ],
             "tempfile_extension": ".ps1",
             "type": "shell-local"
         },
         {
-            "inline": "Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false",
+            "inline": "$ErrorActionPreference = 'Stop'; Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false",
             "type": "powershell"
         },
 
