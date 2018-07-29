@@ -62,13 +62,6 @@ default['git']['url'] = "https://github.com/git-for-windows/git/releases/downloa
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
 #
-# GPG
-#
-
-default['gnugpg']['win']['install_loc'] = "#{tools_path}/gpg"
-default['gnugpg']['win']['install_loc_2'] = "#{tools_path}/gpg2"
-
-#
 # JENKINS
 #
 
