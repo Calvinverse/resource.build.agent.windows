@@ -465,7 +465,7 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -showHostName'
             + " -executors $($env:NUMBER_OF_PROCESSORS)"
             + ' -fsroot "#{jenkins_bin_path}"'
-            + ' -labelsFile "#{jenkins_label_file_path}"'
+            + ' -labelsFile "#{jenkins_labels_file}"'
             + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}'
             + ' -mode EXCLUSIVE'
             + ' -username {{ key "config/environment/directory/query/groups/builds/agent" }}'
