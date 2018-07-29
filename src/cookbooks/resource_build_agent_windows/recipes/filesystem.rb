@@ -9,7 +9,8 @@
 
 languages_directory = node['paths']['languages']
 tools_directory = node['paths']['tools']
-%W[#{languages_directory} #{tools_directory}].each do |path|
+temp_directory = node['paths']['temp']
+%W[#{languages_directory} #{tools_directory} #{temp_directory}].each do |path|
   directory path do
     action :create
     rights :read, 'Everyone', applies_to_children: true
