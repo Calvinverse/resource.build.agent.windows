@@ -90,7 +90,57 @@ powershell_script 'install_npm' do
   code <<-POWERSHELL
     $ErrorActionPreference = 'Stop'
 
-    npm install -g npm@#{node['npm']['version']}
+    # Because NPM sucks they broke their own update on Windows, so lets go Powershell our way out of
+    # trouble by using a modification of the script found here: https://gist.github.com/noahleigh/ba34e18b3e0bc4a6a4e93ed7a480536e
+
+    $ErrorActionPreference = 'stop'
+
+    # Create a folder in the Temp directory and return it
+    # Source: https://stackoverflow.com/a/34559554/9165387
+    function New-TemporaryDirectory {
+        $parent = [System.IO.Path]::GetTempPath()
+        $name = [System.IO.Path]::GetRandomFileName()
+        New-Item -ItemType Directory -Path (Join-Path $parent $name)
+    }
+
+    # Get the path to the active node install from nvm
+    $currentVer = (
+        nvm list | ForEach-Object {[regex]::Match($_, "\\* (\\d+\\.\\d+.\\d+)")} |
+        Where-Object Success | ForEach-Object {"v" + $_.Captures.Groups[1].Value} |
+        Select-Object -First 1
+    )
+    $nvmRoot = (
+        nvm root | ForEach-Object {[regex]::Match($_, "Current Root: (.+)")} |
+        Where-Object Success | ForEach-Object {$_.Captures.Groups[1].Value} |
+        Select-Object -First 1
+    )
+    $nodeInstallPath = Join-Path $nvmRoot $currentVer
+
+    if (-not (Test-Path $nodeInstallPath)) {
+        throw [System.IO.FileNotFoundException] "Test-Path : `"$nodeInstallPath`" does not exist."
+    }
+
+    # Create a temp directory and move the node_modules\\npm dir into it
+    $tempDir = New-TemporaryDirectory
+    Write-Output "Moving '$(Join-Path (Join-Path $nodeInstallPath "node_modules") "npm")' to '$tempDir'..."
+    Move-Item $(Join-Path (Join-Path $nodeInstallPath "node_modules") "npm") $tempDir
+
+    # Delete the npm and npm.cmd files from the node folder
+    Write-Output "Removing 'npm' and 'npm.cmd' from '$nodeInstallPath'..."
+    Remove-Item $(Join-Path $nodeInstallPath "npm*")
+
+    $tempNpmBinDir = Join-Path (Join-Path $tempDir "npm") "bin"
+    if (-not (Test-Path $tempNpmBinDir)) {
+        throw [System.IO.FileNotFoundException] "Test-Path : `"$tempNpmBinDir`" does not exist."
+    }
+
+    # Run the install script from the temp folder
+    Write-Output "Running `"node npm-cli.js i npm@latest -g`" from `"$tempNpmBinDir`"..."
+    node $(Join-Path $tempNpmBinDir "npm-cli.js") i 'npm@latest' -g
+
+    # Delete the temp folder once complete
+    Write-Output "Cleanup..."
+    Remove-Item $tempDir -Recurse
   POWERSHELL
 end
 
