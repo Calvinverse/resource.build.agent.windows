@@ -185,6 +185,23 @@
             <Template>$(DirSrcPacker)\packer_variables.json</Template>
             <Encoding></Encoding>
         </BuildFilesToGenerate>
+
+        <BuildFilesToGenerate Include="$(DirBuildTempIso)\variables.ps1">
+            <Template>$(DirBuildTempUnattend)\scripts\variables.ps1</Template>
+            <Encoding>UTF-8</Encoding>
+        </BuildFilesToGenerate>
+        <BuildFilesToGenerate Include="$(DirBuildTempIso)\setupcomplete.cmd">
+            <Template>$(DirBuildTempUnattend)\scripts\setupcomplete.cmd</Template>
+            <Encoding></Encoding>
+        </BuildFilesToGenerate>
+        <BuildFilesToGenerate Include="$(DirBuildTempIso)\autounattend.xml">
+            <Template>$(DirBuildTempUnattend)\unattend\prepare_image_autounattend.xml</Template>
+            <Encoding></Encoding>
+        </BuildFilesToGenerate>
+        <BuildFilesToGenerate Include="$(DirBuildTempIso)\sysprep-unattend.xml">
+            <Template>$(DirBuildTempUnattend)\unattend\sysprep_image_autounattend.xml</Template>
+            <Encoding></Encoding>
+        </BuildFilesToGenerate>
     </ItemGroup>
 
 
