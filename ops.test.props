@@ -80,6 +80,11 @@
     <ItemGroup Condition=" '$(ShouldLoadFilesToCopy)' == 'true' ">
         <FilesToCopy
             Condition=" '$(IsTest)' == 'true' "
+            Include="$(DirTestsIntegration)\scripts\**\*.*">
+            <Destination>$(DirBuildTempTestsIntegration)\scripts</Destination>
+        </FilesToCopy>
+        <FilesToCopy
+            Condition=" '$(IsTest)' == 'true' "
             Exclude="$(DirTestsIntegrationPester)\System.Tests.ps1;$(DirTestsIntegrationPester)\Users.Tests.ps1"
             Include="$(DirTestsIntegrationPester)\**\*.*">
             <Destination>$(DirBuildTempTestsIntegrationPester)</Destination>
