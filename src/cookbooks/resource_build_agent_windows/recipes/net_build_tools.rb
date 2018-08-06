@@ -23,21 +23,33 @@ msbuild_install_options =
   ' --wait' \
   ' --nocache' \
   ' --noUpdateInstaller' \
-  ' -add Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended' \
-  ' -add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended' \
-  ' -add Microsoft.VisualStudio.Workload.MSBuildTools' \
-  ' -add Microsoft.VisualStudio.Workload.NetCoreBuildTools' \
-  ' -add Microsoft.VisualStudio.Workload.VCTools' \
-  ' -add Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended' \
-  ' -add Microsoft.Net.Component.4.7.1.SDK' \
-  ' -add Microsoft.Net.Component.4.7.1.TargetingPack' \
-  ' -add Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools'
+  ' --add "Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.MSBuildTools"' \
+  ' --add "Microsoft.VisualStudio.Workload.NetCoreBuildTools"' \
+  ' --add "Microsoft.VisualStudio.Workload.VCTools"' \
+  ' --add "Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended"' \
+  ' --add "Microsoft.Net.Component.4.7.1.SDK"' \
+  ' --add "Microsoft.Net.Component.4.7.1.TargetingPack"' \
+  ' --add "Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools"'
 
-windows_package 'MsBuild' do
-  action :install
-  installer_type :custom
-  options msbuild_install_options
-  source node['net_build_tools']['url']
+# Because MS sucks at making VS installers we have to do this the hard way. Apparently --wait doesn't
+# actually wait because that would be too sensible, so lets powershell this sucker
+powershell_script 'install_vs_buildtools' do
+  code <<-EOH
+    $installerPath = Join-Path #{default['paths']['temp']} 'vs_buildtools.exe'
+
+    # Download the installer
+    Invoke-WebRequest -Uri #{node['net_build_tools']['url']} -OutFile $installerPath
+
+    # Invoke the installer
+    & $installerPath #{msbuild_install_options}
+
+    # Eventhough we specify the --wait option, it won't because ... reasons. So do this the hard way
+    # go find the process and wait for it to exit. Because we don't know exactly which one to wait for
+    # we wait for all of these to exit
+    Wait-Process -Name 'vs_buildtools', 'vs_installer', 'vs_setup_bootstrapper'
+  EOH
 end
 
 #
