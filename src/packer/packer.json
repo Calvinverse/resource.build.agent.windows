@@ -66,7 +66,7 @@
         },
 
         {
-            "inline": "$ErrorActionPreference = 'Stop'; $dvdDrive = Get-WmiObject -Class Win32_Volume -Filter \"DriveType=5\"; if ($dvdDrive -ne $null) { $dvdDriveLetter = $dvdDrive | Select-Object -ExpandProperty DriveLetter; if (-not (Test-Path -Path 'f:')) { $dvdDrive | Set-WmiInstance -Arguments @{ DriveLetter='f:'} } }",
+            "inline": "$ErrorActionPreference = 'Stop'; Get-WmiObject -Class Win32_volume -Filter 'DriveType=5' | Select-Object -First 1 | Set-WmiInstance -Arguments @{DriveLetter='f:'}",
             "type": "powershell"
         },
         {
