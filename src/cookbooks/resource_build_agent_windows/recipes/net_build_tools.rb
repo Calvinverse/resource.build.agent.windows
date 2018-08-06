@@ -36,8 +36,8 @@ msbuild_install_options =
 # Because MS sucks at making VS installers we have to do this the hard way. Apparently --wait doesn't
 # actually wait because that would be too sensible, so lets powershell this sucker
 powershell_script 'install_vs_buildtools' do
-  code <<-EOH
-    $installerPath = Join-Path #{default['paths']['temp']} 'vs_buildtools.exe'
+  code <<-POWERSHELL
+    $installerPath = Join-Path #{node['paths']['temp']} 'vs_buildtools.exe'
 
     # Download the installer
     Invoke-WebRequest -Uri #{node['net_build_tools']['url']} -OutFile $installerPath
@@ -49,7 +49,7 @@ powershell_script 'install_vs_buildtools' do
     # go find the process and wait for it to exit. Because we don't know exactly which one to wait for
     # we wait for all of these to exit
     Wait-Process -Name 'vs_buildtools', 'vs_installer', 'vs_setup_bootstrapper'
-  EOH
+  POWERSHELL
 end
 
 #
