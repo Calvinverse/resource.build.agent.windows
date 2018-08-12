@@ -144,6 +144,11 @@
         },
 
         {
+            "restart_timeout": "20m",
+            "type": "windows-restart"
+        },
+
+        {
             "env_var_format": "$env:%s=\"%s\"; ",
             "execute_command" : ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": ["{{ user `dir_scripts_user` }}/Copy-LogFilesFromVm.ps1 -vmName {{ user `vm_name` }} -userName {{ user `admin_username` }} -userPassword {{ user `admin_password` }} -targetDirectory {{ user `dir_log` }}/packer.beforesysprep"],
