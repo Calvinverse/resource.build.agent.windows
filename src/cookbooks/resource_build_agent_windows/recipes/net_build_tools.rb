@@ -33,23 +33,11 @@ msbuild_install_options =
   ' --add "Microsoft.Net.Component.4.7.1.TargetingPack"' \
   ' --add "Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools"'
 
-# Because MS sucks at making VS installers we have to do this the hard way. Apparently --wait doesn't
-# actually wait because that would be too sensible, so lets powershell this sucker
-powershell_script 'install_vs_buildtools' do
-  code <<-POWERSHELL
-    $installerPath = Join-Path #{node['paths']['temp']} 'vs_buildtools.exe'
-
-    # Download the installer
-    Invoke-WebRequest -Uri #{node['net_build_tools']['url']} -OutFile $installerPath
-
-    # Invoke the installer
-    & $installerPath #{msbuild_install_options}
-
-    # Eventhough we specify the --wait option, it won't because ... reasons. So do this the hard way
-    # go find the process and wait for it to exit. Because we don't know exactly which one to wait for
-    # we wait for all of these to exit
-    Wait-Process -Name 'vs_buildtools', 'vs_installer', 'vs_setup_bootstrapper'
-  POWERSHELL
+windows_package 'MsBuild' do
+  action :install
+  installer_type :custom
+  options msbuild_install_options
+  source node['net_build_tools']['url']
 end
 
 #
