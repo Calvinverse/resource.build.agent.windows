@@ -17,8 +17,8 @@ Describe 'The jenkins application' {
     Context 'has been made into a service' {
         $service = Get-Service jenkins
 
-        It 'that is enabled' {
-            $service.StartType | Should Match 'Automatic'
+        It 'that is disabled' {
+            $service.StartType | Should Match 'Disabled'
         }
 
         It 'and is not running' {
