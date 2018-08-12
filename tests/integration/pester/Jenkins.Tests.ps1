@@ -12,10 +12,6 @@ Describe 'The jenkins application' {
         It 'with jolokia binaries in c:\ops\jolokia' {
             'c:\ops\jolokia\jolokia.jar' | Should Exist
         }
-
-        It 'with environment variable pointing to the install location' {
-            $env:JENKINS_HOME | Should Be 'c:\ops\jenkins'
-        }
     }
 
     Context 'has been made into a service' {

@@ -140,10 +140,6 @@ remote_file swarm_slave_jar_path do
   source node['jenkins']['url']['jar']
 end
 
-env 'JENKINS_HOME' do
-  value jenkins_bin_path
-end
-
 #
 # INSTALL JOLOKIA
 #
