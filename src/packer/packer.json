@@ -70,7 +70,7 @@
             "type": "powershell"
         },
         {
-            "inline": "$ErrorActionPreference = 'Stop'; New-Item -Path c:/temp_dvd -ItemType Directory; $drive = 'd:'; if (Test-Path 'e:/client.rb') { $drive = 'e:'} else { if (Test-Path 'f:/client.rb') { $drive = 'f:'} }; Copy-Item \"$($drive)/*\" c:/temp_dvd -Recurse",
+            "inline": "$ErrorActionPreference = 'Stop'; New-Item -Path c:/temp_dvd -ItemType Directory; $drive = 'd:'; if (Test-Path 'e:/client.rb') { $drive = 'e:'} else { if (Test-Path 'f:/client.rb') { $drive = 'f:'} }; Copy-Item \"$($drive)/*\" c:/temp_dvd -Recurse -Verbose",
             "type": "powershell"
         },
 
@@ -91,7 +91,9 @@
             "type": "shell-local"
         },
         {
-            "inline": "Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'workspace' -Confirm:$false",
+            "inline": [
+                "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'workspace' -Confirm:$false; $disk | Set-Disk -IsOffline $false"
+            ],
             "type": "powershell"
         },
 
@@ -106,7 +108,7 @@
             "type": "shell-local"
         },
         {
-            "inline": "$ErrorActionPreference = 'Stop'; Get-Disk | Where-Object partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false",
+            "inline": "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false; $disk | Set-Disk -IsOffline $false",
             "type": "powershell"
         },
 
