@@ -226,7 +226,7 @@ describe 'resource_build_agent_windows::jenkins' do
       function Invoke-Script
       {
           $process = New-JenkinsProcess
-          while ($process -ne $null)
+          while ($process -eq $null)
           {
               Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Jenkins connection values not available"
               Start-Sleep -Seconds 5
@@ -309,29 +309,29 @@ describe 'resource_build_agent_windows::jenkins' do
           $startInfo.UseShellExecute = $false
           $startInfo.CreateNoWindow = $true
 
-          $arguments = '-server'
-              + ' -XX:+AlwaysPreTouch'
-              + ' -XX:+UseConcMarkSweepGC'
-              + ' -XX:+ExplicitGCInvokesConcurrent'
-              + ' -XX:+ParallelRefProcEnabled'
-              + ' -XX:+UseStringDeduplication'
-              + ' -XX:+CMSParallelRemarkEnabled'
-              + ' -XX:+CMSIncrementalMode'
-              + ' -XX:CMSInitiatingOccupancyFraction=75'
-              + ' -Xmx500m'
-              + ' -Xms500m'
-              + ' -Djava.net.preferIPv4Stack=true'
-              + ' -deleteExistingClients'
-              + ' -disableClientsUniqueId'
-              + ' -showHostName'
-              + " -executors $($env:NUMBER_OF_PROCESSORS)"
-              + ' -fsroot "#{jenkins_bin_path}"'
-              + ' -labelsFile "#{jenkins_bin_path}/labels.txt"'
-              + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}'
-              + ' -mode EXCLUSIVE'
-              + ' -username {{ key "config/environment/directory/query/groups/builds/agent" }}'
-              + ' -passwordFile #{jenkins_secrets_path}/user.txt'
-              + ' -javaagent:#{jolokia_bin_path}/jolokia.jar=protocol=http,host=127.0.0.1,port=8090,discoveryEnabled=false'
+          $arguments = '-server' `
+              + ' -XX:+AlwaysPreTouch' `
+              + ' -XX:+UseConcMarkSweepGC' `
+              + ' -XX:+ExplicitGCInvokesConcurrent' `
+              + ' -XX:+ParallelRefProcEnabled' `
+              + ' -XX:+UseStringDeduplication' `
+              + ' -XX:+CMSParallelRemarkEnabled' `
+              + ' -XX:+CMSIncrementalMode' `
+              + ' -XX:CMSInitiatingOccupancyFraction=75' `
+              + ' -Xmx500m' `
+              + ' -Xms500m' `
+              + ' -Djava.net.preferIPv4Stack=true' `
+              + ' -deleteExistingClients' `
+              + ' -disableClientsUniqueId' `
+              + ' -showHostName' `
+              + " -executors $($env:NUMBER_OF_PROCESSORS)" `
+              + ' -fsroot "#{jenkins_bin_path}"' `
+              + ' -labelsFile "#{jenkins_bin_path}/labels.txt"' `
+              + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}' `
+              + ' -mode EXCLUSIVE' `
+              + ' -username {{ key "config/environment/directory/users/builds/agent" }}' `
+              + ' -passwordFile #{jenkins_secrets_path}/user.txt' `
+              + ' -javaagent:#{jolokia_bin_path}/jolokia.jar=protocol=http,host=127.0.0.1,port=8090,discoveryEnabled=false' `
               + ' -jar #{jenkins_bin_path}/slave.jar'
           $startInfo.Arguments = $arguments
 
