@@ -467,6 +467,8 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -Xmx500m' `
             + ' -Xms500m' `
             + ' -Djava.net.preferIPv4Stack=true' `
+            + ' -javaagent:#{jolokia_jar_path}=protocol=http,host=#{jolokia_agent_host},port=#{jolokia_agent_port},discoveryEnabled=false' `
+            + ' -jar #{swarm_slave_jar_path}' `
             + ' -deleteExistingClients' `
             + ' -disableClientsUniqueId' `
             + ' -showHostName' `
@@ -474,11 +476,9 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -fsroot "#{jenkins_bin_path}"' `
             + ' -labelsFile "#{jenkins_labels_file}"' `
             + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}' `
-            + ' -mode EXCLUSIVE' `
+            + ' -mode exclusive' `
             + ' -username {{ key "config/environment/directory/users/builds/agent" }}' `
-            + ' -passwordFile #{jenkins_password_file}' `
-            + ' -javaagent:#{jolokia_jar_path}=protocol=http,host=#{jolokia_agent_host},port=#{jolokia_agent_port},discoveryEnabled=false' `
-            + ' -jar #{swarm_slave_jar_path}'
+            + ' -passwordFile #{jenkins_password_file}'
         $startInfo.Arguments = $arguments
 
         $process = New-Object System.Diagnostics.Process

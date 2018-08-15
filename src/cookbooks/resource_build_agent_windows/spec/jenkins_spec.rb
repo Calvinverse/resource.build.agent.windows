@@ -321,6 +321,8 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -Xmx500m' `
               + ' -Xms500m' `
               + ' -Djava.net.preferIPv4Stack=true' `
+              + ' -javaagent:#{jolokia_bin_path}/jolokia.jar=protocol=http,host=127.0.0.1,port=8090,discoveryEnabled=false' `
+              + ' -jar #{jenkins_bin_path}/slave.jar' `
               + ' -deleteExistingClients' `
               + ' -disableClientsUniqueId' `
               + ' -showHostName' `
@@ -328,11 +330,9 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -fsroot "#{jenkins_bin_path}"' `
               + ' -labelsFile "#{jenkins_bin_path}/labels.txt"' `
               + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}' `
-              + ' -mode EXCLUSIVE' `
+              + ' -mode exclusive' `
               + ' -username {{ key "config/environment/directory/users/builds/agent" }}' `
-              + ' -passwordFile #{jenkins_secrets_path}/user.txt' `
-              + ' -javaagent:#{jolokia_bin_path}/jolokia.jar=protocol=http,host=127.0.0.1,port=8090,discoveryEnabled=false' `
-              + ' -jar #{jenkins_bin_path}/slave.jar'
+              + ' -passwordFile #{jenkins_secrets_path}/user.txt'
           $startInfo.Arguments = $arguments
 
           $process = New-Object System.Diagnostics.Process
