@@ -335,8 +335,6 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -jar #{jenkins_bin_path}/slave.jar'
           $startInfo.Arguments = $arguments
 
-          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Starting jenkins ... "
-          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Using arguments: $($startInfo.Arguments)"
           $process = New-Object System.Diagnostics.Process
           $process.StartInfo = $startInfo
 
