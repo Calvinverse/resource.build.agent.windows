@@ -225,6 +225,17 @@ powershell_script 'jenkins_as_service' do
   POWERSHELL
 end
 
+# Create the event log source for the jenkins service. We'll create it now because the service runs as a normal user
+# and is as such not allowed to create eventlog sources
+registry_key "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\eventlog\\Application\\#{service_name}" do
+  values [{
+    name: 'EventMessageFile',
+    type: :string,
+    data: 'c:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\EventLogMessages.dll'
+  }]
+  action :create
+end
+
 #
 # NODE LABELS
 #
