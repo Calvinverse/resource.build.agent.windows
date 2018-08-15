@@ -241,7 +241,7 @@ describe 'resource_build_agent_windows::jenkins' do
           }
 
           Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Starting jenkins ... "
-          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Using arguments: $($startInfo.Arguments)"
+          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Using arguments: $($process.StartInfo.Arguments)"
 
           # Adding event handers for stdout and stderr.
           $writeToFileEvent = {
