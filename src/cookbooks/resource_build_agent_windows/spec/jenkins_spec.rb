@@ -398,7 +398,7 @@ describe 'resource_build_agent_windows::jenkins' do
         # command will only run if the resulting template changes. The command must
         # return within 30s (configurable), and it must have a successful exit code.
         # Consul Template is not a replacement for a process monitor or init system.
-        command = "powershell.exe -noprofile -nologo -noninteractive -command \\"Restart-Service #{service_name}\\" "
+        command = "powershell.exe -noprofile -nologo -noninteractive -command \\"Set-Service #{service_name} -StartupType Automatic; Restart-Service #{service_name}\\" "
 
         # This is the maximum amount of time to wait for the optional command to
         # return. Default is 30s.
