@@ -29,10 +29,6 @@ describe 'resource_build_agent_windows::jenkins' do
     it 'creates slave.jar in the jenkins ops directory' do
       expect(chef_run).to create_remote_file("#{jenkins_bin_path}/slave.jar")
     end
-
-    it 'sets the JENKINS_HOME environment variable' do
-      expect(chef_run).to create_env('JENKINS_HOME')
-    end
   end
 
   context 'create the jolokia locations' do
