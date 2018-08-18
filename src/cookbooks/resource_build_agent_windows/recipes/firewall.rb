@@ -113,3 +113,12 @@ firewall_rule 'unbound-dns-tcp' do
   direction :in
   protocol :tcp
 end
+
+firewall_rule 'unbound-control-tcp' do
+  command :allow
+  description 'Allow Unbound control (TCP) proxy traffic'
+  dest_port unbound_control_port
+  direction :in
+  protocol :tcp
+  source '127.0.0.1'
+end

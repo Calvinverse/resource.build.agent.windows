@@ -117,5 +117,15 @@ describe 'resource_build_agent_windows::firewall' do
         protocol: :tcp
       )
     end
+
+    it 'opens the Unbound control TCP port' do
+      expect(chef_run).to create_firewall_rule('unbound-control-tcp').with(
+        command: :allow,
+        dest_port: 8953,
+        direction: :in,
+        protocol: :tcp,
+        source: '127.0.0.1'
+      )
+    end
   end
 end
