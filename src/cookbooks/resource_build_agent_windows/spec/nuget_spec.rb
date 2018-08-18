@@ -37,5 +37,9 @@ describe 'resource_build_agent_windows::nuget' do
     it 'adds the nuget label' do
       expect(chef_run).to run_ruby_block('add_nuget_label')
     end
+
+    it 'deletes the labels.txt.old backup file' do
+      expect(chef_run).to delete_file('c:/ops/jenkins/labels.txt.old')
+    end
   end
 end

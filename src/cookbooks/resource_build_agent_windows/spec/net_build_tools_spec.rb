@@ -41,5 +41,9 @@ describe 'resource_build_agent_windows::net_build_tools' do
     it 'adds the msbuild label' do
       expect(chef_run).to run_ruby_block('add_msbuild_label')
     end
+
+    it 'deletes the labels.txt.old backup file' do
+      expect(chef_run).to delete_file('c:/ops/jenkins/labels.txt.old')
+    end
   end
 end

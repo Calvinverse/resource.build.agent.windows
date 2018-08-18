@@ -71,5 +71,9 @@ describe 'resource_build_agent_windows::nodejs' do
     it 'adds the nodejs label' do
       expect(chef_run).to run_ruby_block('add_nodejs_label')
     end
+
+    it 'deletes the labels.txt.old backup file' do
+      expect(chef_run).to delete_file('c:/ops/jenkins/labels.txt.old')
+    end
   end
 end

@@ -61,3 +61,9 @@ ruby_block 'add_nuget_label' do
     file.write_file
   end
 end
+
+# Chef::Util::FileEdit creates the .old file when it inserts the line.
+# We don't want this file so nuke it.
+file "#{jenkins_labels_file}.old" do
+  action :delete
+end
