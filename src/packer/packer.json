@@ -81,6 +81,13 @@
         },
 
         {
+            "inline": [
+                "$ErrorActionPreference = 'Stop'; Set-StorageSetting –NewDiskPolicy OnlineAll"
+            ],
+            "type": "powershell"
+        },
+
+        {
             "env_var_format": "$env:%s=\"%s\"; ",
             "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": [
