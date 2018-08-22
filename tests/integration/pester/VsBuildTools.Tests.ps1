@@ -6,8 +6,10 @@ Describe 'The .NET build tools application' {
             'c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\bin\amd64\msbuild.exe' | Should Exist
         }
 
+        $output = & msbuild /version
         It 'is on the PATH' {
-            (& msbuild /version) | Should Not Be ''
+            $output | Should Not Be $null
+            $output.Length | Should BeGreaterThan 0
         }
     }
 }

@@ -14,15 +14,31 @@ Describe 'The jenkins application' {
         }
     }
 
+    Context 'has a redirected workspace directory' {
+        It 'has a workspace directory' {
+            'c:\ops\jenkins\workspace' | Should Exist
+        }
+
+        $dir = Get-Item 'c:\ops\jenkins\workspace'
+
+        It 'is a symbolic link' {
+            $dir.LinkType | Should Match 'SymbolicLink'
+        }
+
+        It 'that points to the correct target' {
+            $dir.Target | Should Be 'd:\'
+        }
+    }
+
     Context 'has been made into a service' {
         $service = Get-Service jenkins
 
-        It 'that is disabled' {
-            $service.StartType | Should Match 'Disabled'
+        It 'that is enabled' {
+            $service.StartType | Should Match 'Automatic'
         }
 
-        It 'and is not running' {
-            $service.Status | Should Match 'Stopped'
+        It 'and is running' {
+            $service.Status | Should Match 'Running'
         }
     }
 }

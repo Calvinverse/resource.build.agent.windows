@@ -4,8 +4,10 @@ Describe 'The nuget application' {
             'C:\tools\nuget\nuget.exe' | Should Exist
         }
 
+        $output = & nuget
         It 'is on the PATH' {
-            (& nuget) | Should Not Be ''
+            $output | Should Not Be $null
+            $output.Length | Should BeGreaterThan 0
         }
     }
 }
