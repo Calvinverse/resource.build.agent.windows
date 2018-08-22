@@ -235,7 +235,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <VersionWindowsBaseResource>0.2.0</VersionWindowsBaseResource>
+        <VersionWindowsBaseResource>0.2.1</VersionWindowsBaseResource>
     </PropertyGroup>
 
 
