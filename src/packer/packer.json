@@ -82,7 +82,8 @@
 
         {
             "inline": [
-                "$ErrorActionPreference = 'Stop'; Set-StorageSetting –NewDiskPolicy OnlineAll"
+                "$ErrorActionPreference = 'Stop'; Set-StorageSetting -NewDiskPolicy OnlineAll",
+                "$ErrorActionPreference = 'Stop'; Get-StorageSetting"
             ],
             "type": "powershell"
         },
@@ -99,7 +100,8 @@
         },
         {
             "inline": [
-                "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'workspace' -Confirm:$false; $disk | Set-Disk -IsOffline $false"
+                "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'workspace' -Confirm:$false; $disk | Set-Disk -IsOffline $false",
+                "$ErrorActionPreference = 'Stop'; Get-Disk"
             ],
             "type": "powershell"
         },
@@ -115,7 +117,10 @@
             "type": "shell-local"
         },
         {
-            "inline": "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false; $disk | Set-Disk -IsOffline $false",
+            "inline": [
+                "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false; $disk | Set-Disk -IsOffline $false",
+                "$ErrorActionPreference = 'Stop'; Get-Disk"
+            ],
             "type": "powershell"
         },
 
