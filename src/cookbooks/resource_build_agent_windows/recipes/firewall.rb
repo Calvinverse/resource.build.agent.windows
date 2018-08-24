@@ -117,7 +117,7 @@ end
 firewall_rule 'unbound-control-tcp' do
   command :allow
   description 'Allow Unbound control (TCP) proxy traffic'
-  dest_port unbound_control_port
+  dest_port 8953
   direction :in
   protocol :tcp
   source '127.0.0.1'
