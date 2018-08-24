@@ -123,14 +123,6 @@ describe 'resource_build_agent_windows::jenkins' do
     end
   end
 
-  context 'creates the workspace' do
-    let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
-
-    it 'create the symbolic link to the workspace drive' do
-      expect(chef_run).to run_powershell_script('workspace_symbolic_link')
-    end
-  end
-
   context 'create the consul-template files for jenkins' do
     let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 

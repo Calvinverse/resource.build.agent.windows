@@ -131,6 +131,12 @@ default['nuget']['path']['exe_file'] = "#{node['nuget']['path']['exe']}/nuget.ex
 default['nuget']['path']['cache'] = 'e:/nuget'
 
 #
+# PROVISIONING
+#
+
+default['provisioning']['path']['bin'] = "#{node['paths']['ops']}/provisioning"
+
+#
 # TELEGRAF
 #
 

@@ -251,27 +251,6 @@ file jenkins_labels_file do
 end
 
 #
-# WORKSPACE SYMBOLIC LINK
-#
-
-# NOTE: this assumes that the workspace drive has the label 'workspace' as set in the packer config
-# file. If you change the drive label, you have to change the script below as well.
-powershell_script 'workspace_symbolic_link' do
-  code <<-POWERSHELL
-    $ErrorActionPreference = 'Stop'
-
-    $workspaceDrive = Get-Volume -FileSystemLabel 'workspace'
-    $workspaceDriveLetter = $workspaceDrive.DriveLetter
-
-    $workspaceDirectory = '#{jenkins_bin_path}/workspace'
-    if (-not (Test-Path $workspaceDirectory))
-    {
-        New-Item -Path $workspaceDirectory -ItemType SymbolicLink -Value "$($workspaceDriveLetter):"
-    }
-  POWERSHELL
-end
-
-#
 # CONSUL-TEMPLATE
 #
 
