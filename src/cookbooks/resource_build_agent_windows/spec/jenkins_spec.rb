@@ -288,7 +288,7 @@ describe 'resource_build_agent_windows::jenkins' do
       {{ if keyExists "config/services/consul/domain" }}
       {{ if keyExists "config/services/builds/protocols/http/host" }}
       {{ if keyExists "config/services/builds/protocols/http/port" }}
-      {{ if keyExists "config/environment/directory/query/groups/builds/agent" }}
+      {{ if keyExists "config/environment/directory/users/builds/agent" }}
       {{ if keyExists "config/services/builds/protocols/http/virtualdirectory" }}
           $startInfo = New-Object System.Diagnostics.ProcessStartInfo
           $startInfo.FileName = "java"
@@ -333,7 +333,7 @@ describe 'resource_build_agent_windows::jenkins' do
           return $null
       {{ end }}
       {{ else }}
-          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/environment/directory/query/groups/builds/agent' not available. Will not start Jenkins."
+          Write-Output "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') - Consul K-V values at 'config/environment/directory/users/builds/agent' not available. Will not start Jenkins."
           return $null
       {{ end }}
       {{ else }}
