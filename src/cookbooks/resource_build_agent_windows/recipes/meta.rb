@@ -18,6 +18,11 @@ env 'RESOURCE_SHORT_NAME' do
   value resource_short_name
 end
 
+resource_short_name = node['resource']['name_acronym']
+env 'RESOURCE_ACRONYM_NAME' do
+  value resource_short_name
+end
+
 resource_version_major = node['resource']['version_major']
 env 'RESOURCE_VERSION_MAJOR' do
   value resource_version_major

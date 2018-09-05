@@ -11,3 +11,4 @@ default['resource']['version_semantic'] = '${VersionSemantic}'
 
 default['resource']['name'] = '${ProductName}'
 default['resource']['name_short'] = '${ProductShortName}'
+default['resource']['name_acronym'] = '${ProductAcronymName}'
