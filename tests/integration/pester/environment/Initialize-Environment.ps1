@@ -43,8 +43,8 @@ function Initialize-Environment
             }
         }
 
-        Write-Output "Giving Consul-Template 30 seconds to process the data ..."
-        Start-Sleep -Seconds 30
+        Write-Output "Giving Consul-Template 90 seconds to process the data ..."
+        Start-Sleep -Seconds 90
     }
     catch
     {
@@ -105,11 +105,19 @@ function Set-ConsulKV
 
     Write-Output "Setting consul key-values ..."
 
+    # load config/environment/directory
+    & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/environment/directory/users/builds/agent 'build.agent'
+
     # Load config/services/consul
     & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/consul/datacenter 'test-integration'
     & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/consul/domain 'integrationtest'
 
     & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/consul/metrics/statsd/rules '\"consul.*.*.* .measurement.measurement.field\",'
+
+    # load config/services/builds
+    & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/builds/protocols/http/host 'active.builds'
+    & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/builds/protocols/http/port '8080'
+    & 'c:\ops\consul\consul.exe' kv put -http-addr=http://127.0.0.1:8550 config/services/builds/protocols/http/virtualdirectory 'builds'
 
     # Explicitly don't provide a metrics address because that means telegraf will just send the metrics to
     # a black hole
