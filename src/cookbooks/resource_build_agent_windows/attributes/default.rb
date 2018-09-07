@@ -101,7 +101,7 @@ default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepa
 default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.exe'
 
 #
-# NODE / NPM
+# NODE / NPM / YARN
 #
 
 default['nodejs']['path']['base'] = "#{languages_path}/node"
@@ -117,6 +117,7 @@ default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
 default['npm']['version'] = '6.1.0'
 default['npm']['path']['cache'] = 'e:/npm'
+default['yarn']['path']['cache'] = 'e:/yarn'
 
 #
 # NUGET

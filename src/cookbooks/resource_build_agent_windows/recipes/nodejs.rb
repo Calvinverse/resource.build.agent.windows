@@ -21,6 +21,14 @@ env 'npm_config_cache' do
   value npm_cache_path
 end
 
+env 'npm_config_progress' do
+  value 'false'
+end
+
+env 'npm_config_spin' do
+  value 'false'
+end
+
 #
 # INSTALL NVM
 #

@@ -9,6 +9,14 @@ describe 'resource_build_agent_windows::nodejs' do
     it 'sets the npm_config_cache environment variable' do
       expect(chef_run).to create_env('npm_config_cache')
     end
+
+    it 'sets the npm_config_progress environment variable' do
+      expect(chef_run).to create_env('npm_config_progress')
+    end
+
+    it 'sets the npm_config_spin environment variable' do
+      expect(chef_run).to create_env('npm_config_spin')
+    end
   end
 
   context 'installs nvm' do
