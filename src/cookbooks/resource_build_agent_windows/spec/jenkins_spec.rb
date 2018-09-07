@@ -309,6 +309,7 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -Xmx500m' `
               + ' -Xms500m' `
               + ' -Djava.net.preferIPv4Stack=true' `
+              + ' -Dfile.encoding=UTF8' `
               + ' -javaagent:#{jolokia_bin_path}/jolokia.jar=protocol=http,host=127.0.0.1,port=8090,discoveryEnabled=false' `
               + ' -jar #{jenkins_bin_path}/slave.jar' `
               + ' -deleteExistingClients' `
