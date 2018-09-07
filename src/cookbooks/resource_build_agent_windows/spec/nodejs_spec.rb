@@ -17,6 +17,10 @@ describe 'resource_build_agent_windows::nodejs' do
     it 'sets the npm_config_spin environment variable' do
       expect(chef_run).to create_env('npm_config_spin')
     end
+
+    it 'sets the yarn_cache_folder environment variable' do
+      expect(chef_run).to create_env('yarn_cache_folder')
+    end
   end
 
   context 'installs nvm' do

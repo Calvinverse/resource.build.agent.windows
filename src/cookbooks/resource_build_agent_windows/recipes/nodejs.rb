@@ -29,6 +29,15 @@ env 'npm_config_spin' do
   value 'false'
 end
 
+yarn_cache_path = node['yarn']['path']['cache']
+directory yarn_cache_path do
+  action :create
+  rights :modify, 'Everyone', applies_to_children: true, applies_to_self: false
+end
+env 'yarn_cache_folder' do
+  value yarn_cache_path
+end
+
 #
 # INSTALL NVM
 #
