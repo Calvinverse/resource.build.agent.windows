@@ -70,8 +70,8 @@ default['jenkins']['service']['name'] = 'jenkins'
 default['jenkins']['service']['user_name'] = 'jenkins_user'
 default['jenkins']['service']['user_password'] = SecureRandom.uuid
 
-default['jenkins']['version'] = '3.13'
-default['jenkins']['checksum'] = '85197CCED609BB36EFC677813BCD3242813569970FF32BEF49A10EE6AD7FB630'
+default['jenkins']['version'] = '3.15'
+default['jenkins']['checksum'] = '6812E86A220D2D6C4D3FFFABD646B7BB19A4144693958B2A943FA6B845F081B1'
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
 
 default['jenkins']['file']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
