@@ -55,9 +55,9 @@ default['firewall']['paths']['logs'] = "#{logs_path}/firewall"
 # GIT
 #
 
-default['git']['version'] = '2.18.0'
+default['git']['version'] = '2.20.1'
 default['git']['architecture'] = '64'
-default['git']['checksum'] = 'aa81c9f2a81fd07ba0582095474365821880fd787b1cbe03abaf71d9aa69d359'
+default['git']['checksum'] = '0dce453188d4aed938e3fd1919393a3600dd3dfe100f3fc92f54f80e372e031f'
 default['git']['url'] = "https://github.com/git-for-windows/git/releases/download/v#{node['git']['version']}.windows.1/Git-#{node['git']['version']}-#{node['git']['architecture']}-bit.exe"
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
