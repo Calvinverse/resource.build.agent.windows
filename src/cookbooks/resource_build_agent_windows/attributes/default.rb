@@ -105,17 +105,17 @@ default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.
 #
 
 default['nodejs']['path']['base'] = "#{languages_path}/node"
-default['nodejs']['version'] = '8.11.3'
+default['nodejs']['version'] = '8.14.1'
 
-default['nvm']['version'] = '1.1.6'
-default['nvm']['checksum'] = '975697D7A3AB697060FE71FFBB37DBA7FF2120295EAD3E75799F935CA7403135'
+default['nvm']['version'] = '1.1.7'
+default['nvm']['checksum'] = 'E849BD99ACE4C4D4D194409C3FB2858DF2B775423ACF6B099A8ACF3443ABD17C'
 default['nvm']['url'] = "https://github.com/coreybutler/nvm-windows/releases/download/#{node['nvm']['version']}/nvm-noinstall.zip"
 
 default['nvm']['path']['bin'] = "#{node['nodejs']['path']['base']}/nvm"
 default['nvm']['path']['symlink'] = "#{node['nodejs']['path']['base']}/nodejs"
 default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
-default['npm']['version'] = '6.1.0'
+default['npm']['version'] = '6.5.0'
 default['npm']['path']['cache'] = 'e:/npm'
 default['yarn']['path']['cache'] = 'e:/yarn'
 
