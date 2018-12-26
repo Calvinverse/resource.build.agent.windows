@@ -235,7 +235,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <VersionWindowsBaseResource>0.2.1</VersionWindowsBaseResource>
+        <VersionWindowsBaseResource>0.2.2</VersionWindowsBaseResource>
     </PropertyGroup>
 
 
@@ -557,7 +557,7 @@
         </TemplateTokens>
 
         <TemplateTokens Include="HostIpAddress">
-            <ReplacementValue>192.168.3.25</ReplacementValue>
+            <ReplacementValue>192.168.3.73</ReplacementValue>
         </TemplateTokens>
 
         <!-- For the Packer config -->
