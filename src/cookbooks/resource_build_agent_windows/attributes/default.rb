@@ -123,8 +123,8 @@ default['yarn']['path']['cache'] = 'e:/yarn'
 # NUGET
 #
 
-default['nuget']['version'] = '4.7.0'
-default['nuget']['checksum'] = '0EABCC242D51D11A0E7BA07B7F1BC746B0E28D49C6C0FC03EDF715D252B03E13'
+default['nuget']['version'] = '4.9.2'
+default['nuget']['checksum'] = 'DD283B92D03FAFF8F8816D631A8C859FEAE6C0CE260FE68AE7E61849A157821F'
 default['nuget']['url'] = "https://dist.nuget.org/win-x86-commandline/v#{node['nuget']['version']}/nuget.exe"
 
 default['nuget']['path']['exe'] = "#{tools_path}/nuget"
