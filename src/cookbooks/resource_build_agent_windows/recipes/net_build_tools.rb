@@ -38,6 +38,7 @@ windows_package 'MsBuild' do
   installer_type :custom
   options msbuild_install_options
   source node['net_build_tools']['url']
+  timeout 1200
 end
 
 #
