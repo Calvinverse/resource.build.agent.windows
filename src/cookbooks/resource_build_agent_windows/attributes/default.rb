@@ -55,9 +55,9 @@ default['firewall']['paths']['logs'] = "#{logs_path}/firewall"
 # GIT
 #
 
-default['git']['version'] = '2.18.0'
+default['git']['version'] = '2.20.1'
 default['git']['architecture'] = '64'
-default['git']['checksum'] = 'aa81c9f2a81fd07ba0582095474365821880fd787b1cbe03abaf71d9aa69d359'
+default['git']['checksum'] = '0dce453188d4aed938e3fd1919393a3600dd3dfe100f3fc92f54f80e372e031f'
 default['git']['url'] = "https://github.com/git-for-windows/git/releases/download/v#{node['git']['version']}.windows.1/Git-#{node['git']['version']}-#{node['git']['architecture']}-bit.exe"
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
@@ -70,8 +70,8 @@ default['jenkins']['service']['name'] = 'jenkins'
 default['jenkins']['service']['user_name'] = 'jenkins_user'
 default['jenkins']['service']['user_password'] = SecureRandom.uuid
 
-default['jenkins']['version'] = '3.13'
-default['jenkins']['checksum'] = '85197CCED609BB36EFC677813BCD3242813569970FF32BEF49A10EE6AD7FB630'
+default['jenkins']['version'] = '3.15'
+default['jenkins']['checksum'] = '6812E86A220D2D6C4D3FFFABD646B7BB19A4144693958B2A943FA6B845F081B1'
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
 
 default['jenkins']['file']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
@@ -105,17 +105,17 @@ default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.
 #
 
 default['nodejs']['path']['base'] = "#{languages_path}/node"
-default['nodejs']['version'] = '8.11.3'
+default['nodejs']['version'] = '8.14.1'
 
-default['nvm']['version'] = '1.1.6'
-default['nvm']['checksum'] = '975697D7A3AB697060FE71FFBB37DBA7FF2120295EAD3E75799F935CA7403135'
+default['nvm']['version'] = '1.1.7'
+default['nvm']['checksum'] = 'E849BD99ACE4C4D4D194409C3FB2858DF2B775423ACF6B099A8ACF3443ABD17C'
 default['nvm']['url'] = "https://github.com/coreybutler/nvm-windows/releases/download/#{node['nvm']['version']}/nvm-noinstall.zip"
 
 default['nvm']['path']['bin'] = "#{node['nodejs']['path']['base']}/nvm"
 default['nvm']['path']['symlink'] = "#{node['nodejs']['path']['base']}/nodejs"
 default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
-default['npm']['version'] = '6.1.0'
+default['npm']['version'] = '6.5.0'
 default['npm']['path']['cache'] = 'e:/npm'
 default['yarn']['path']['cache'] = 'e:/yarn'
 
@@ -123,8 +123,8 @@ default['yarn']['path']['cache'] = 'e:/yarn'
 # NUGET
 #
 
-default['nuget']['version'] = '4.7.0'
-default['nuget']['checksum'] = '0EABCC242D51D11A0E7BA07B7F1BC746B0E28D49C6C0FC03EDF715D252B03E13'
+default['nuget']['version'] = '4.9.2'
+default['nuget']['checksum'] = 'DD283B92D03FAFF8F8816D631A8C859FEAE6C0CE260FE68AE7E61849A157821F'
 default['nuget']['url'] = "https://dist.nuget.org/win-x86-commandline/v#{node['nuget']['version']}/nuget.exe"
 
 default['nuget']['path']['exe'] = "#{tools_path}/nuget"
