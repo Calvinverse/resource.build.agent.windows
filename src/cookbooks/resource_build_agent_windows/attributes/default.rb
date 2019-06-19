@@ -57,9 +57,9 @@ default['firewall']['paths']['logs'] = "#{logs_path}/firewall"
 # GIT
 #
 
-default['git']['version'] = '2.20.1'
+default['git']['version'] = '2.21.0'
 default['git']['architecture'] = '64'
-default['git']['checksum'] = '0dce453188d4aed938e3fd1919393a3600dd3dfe100f3fc92f54f80e372e031f'
+default['git']['checksum'] = 'C7792387EBD69B3E11B7CC7B92C743F75C180275FA0CE9C7F0C5C7E44E470F80'
 default['git']['url'] = "https://github.com/git-for-windows/git/releases/download/v#{node['git']['version']}.windows.1/Git-#{node['git']['version']}-#{node['git']['architecture']}-bit.exe"
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
@@ -80,7 +80,7 @@ default['java']['path']['base'] = "#{languages_path}/java"
 
 default['jenkins']['service']['exe'] = 'jenkins_service'
 default['jenkins']['service']['name'] = 'jenkins'
-default['jenkins']['service']['user_name'] = 'jenkins_user'
+default['jenkins']['service']['user_name'] = 'jenkins_user' # This user name is also in the Initialize-CustomResource.ps1 script
 default['jenkins']['service']['user_password'] = SecureRandom.uuid
 
 default['jenkins']['version'] = '3.15'
@@ -88,7 +88,7 @@ default['jenkins']['checksum'] = '6812E86A220D2D6C4D3FFFABD646B7BB19A4144693958B
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
 
 default['jenkins']['file']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
-default['jenkins']['file']['labels_file'] = "#{ops_path}/#{node['jenkins']['service']['name']}/labels.txt"
+default['jenkins']['file']['labels_file'] = "#{ci_path}/labels.txt"
 
 #
 # JOLOKIA
@@ -118,7 +118,7 @@ default['net_visual_studio']['url'] = 'https://aka.ms/vs/16/release/vs_enterpris
 #
 
 default['nodejs']['path']['base'] = "#{languages_path}/node"
-default['nodejs']['version'] = '8.14.1'
+default['nodejs']['version'] = '10.16.0'
 
 default['nvm']['version'] = '1.1.7'
 default['nvm']['checksum'] = 'E849BD99ACE4C4D4D194409C3FB2858DF2B775423ACF6B099A8ACF3443ABD17C'
@@ -128,16 +128,19 @@ default['nvm']['path']['bin'] = "#{node['nodejs']['path']['base']}/nvm"
 default['nvm']['path']['symlink'] = "#{node['nodejs']['path']['base']}/nodejs"
 default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
-default['npm']['version'] = '6.5.0'
+default['npm']['version'] = '6.9.0'
 default['npm']['path']['cache'] = 'e:/npm'
+
 default['yarn']['path']['cache'] = 'e:/yarn'
 
 #
 # NUGET
 #
 
-default['nuget']['version'] = '4.9.2'
-default['nuget']['checksum'] = 'DD283B92D03FAFF8F8816D631A8C859FEAE6C0CE260FE68AE7E61849A157821F'
+# default['nuget']['version'] = '5.1.0'
+# default['nuget']['checksum'] = '0ACE4F53493332C9A75291EE96ACD76B371B4E687175E4852BF85948176D7152'
+default['nuget']['version'] = '4.3.1'
+default['nuget']['checksum'] = '17923EBA46EC6FFF200928F862DAA9038742417034353E2407C3B46B3491E206'
 default['nuget']['url'] = "https://dist.nuget.org/win-x86-commandline/v#{node['nuget']['version']}/nuget.exe"
 
 default['nuget']['path']['exe'] = "#{tools_path}/nuget"
@@ -167,7 +170,7 @@ default['buildscripts']['path']['config'] = "#{config_path}/builds"
 # WINSW
 #
 
-default['winsw']['version'] = '2.1.2'
+default['winsw']['version'] = '2.2.0'
 default['winsw']['url'] = "https://github.com/kohsuke/winsw/releases/download/winsw-v#{node['winsw']['version']}/WinSW.NET4.exe"
 
 default['winsw']['path']['bin'] = "#{ops_path}/winsw"
