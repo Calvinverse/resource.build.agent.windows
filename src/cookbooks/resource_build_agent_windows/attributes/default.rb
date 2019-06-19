@@ -100,7 +100,7 @@ default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepa
 # .NET BUILD TOOLS
 #
 
-default['net_build_tools']['url'] = 'https://aka.ms/vs/15/release/vs_buildtools.exe'
+default['net_visual_studio']['url'] = 'https://aka.ms/vs/16/release/vs_enterprise.exe'
 
 #
 # NODE / NPM / YARN
