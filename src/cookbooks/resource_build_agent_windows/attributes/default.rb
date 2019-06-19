@@ -64,6 +64,17 @@ default['git']['url'] = "https://github.com/git-for-windows/git/releases/downloa
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
 #
+# JAVA
+#
+
+default['java']['version']['major'] = '11'
+default['java']['version']['complete'] = "#{node['java']['version']['major']}.0.2"
+default['java']['architecture'] = '64'
+default['java']['url'] = "https://download.java.net/java/GA/jdk#{node['java']['version']['major']}/9/GPL/openjdk-#{node['java']['version']['complete']}_windows-x#{node['java']['architecture']}_bin.zip"
+
+default['java']['path']['base'] = "#{languages_path}/java"
+
+#
 # JENKINS
 #
 
