@@ -104,15 +104,23 @@ end
 #
 
 service_name = node['jenkins']['service']['name']
-jenkins_bin_path = "#{node['paths']['ops']}/#{service_name}"
+jenkins_bin_path = node['paths']['ci']
 jolokia_bin_path = node['jolokia']['path']['jar']
-%W[#{jenkins_bin_path} #{jolokia_bin_path}].each do |path|
-  directory path do
-    action :create
-    inherits false
-    rights :read_execute, service_username, applies_to_children: true, applies_to_self: true
-    rights :full_control, 'Administrators', applies_to_children: true
-  end
+directory jolokia_bin_path do
+  action :create
+  inherits false
+  rights :read_execute, service_username, applies_to_children: true, applies_to_self: true
+  rights :full_control, 'Administrators', applies_to_children: true
+end
+
+# On the jenkins bin path (which is on the D: drive) we don't set the ACL because when we sysprep
+# the box the user's SID is changed. The change is pushed through on the OS volume but not on
+# other volumes which effectively removes the permissions on this folder. So the permissions
+# are set when the box is provisioned
+directory jenkins_bin_path do
+  action :create
+  inherits false
+  rights :full_control, 'Administrators', applies_to_children: true
 end
 
 jenkins_logs_path = "#{node['paths']['logs']}/#{service_name}"
@@ -247,6 +255,7 @@ file jenkins_labels_file do
     windows
     windows_2016
     powershell
+    cmd
   TXT
 end
 
@@ -428,7 +437,7 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
     {{ if keyExists "config/environment/directory/users/builds/agent" }}
     {{ if keyExists "config/services/builds/protocols/http/virtualdirectory" }}
         $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-        $startInfo.FileName = "java"
+        $startInfo.FileName = "#{node['java']['path']['base']}/jdk-#{node['java']['version']['complete']}/bin/java.exe"
         $startInfo.RedirectStandardOutput = $true
         $startInfo.RedirectStandardError = $true
         $startInfo.UseShellExecute = $false
@@ -441,7 +450,6 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -XX:+ParallelRefProcEnabled' `
             + ' -XX:+UseStringDeduplication' `
             + ' -XX:+CMSParallelRemarkEnabled' `
-            + ' -XX:+CMSIncrementalMode' `
             + ' -XX:CMSInitiatingOccupancyFraction=75' `
             + ' -Xmx500m' `
             + ' -Xms500m' `

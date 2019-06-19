@@ -85,7 +85,7 @@ describe 'resource_build_agent_windows::nodejs' do
     end
 
     it 'deletes the labels.txt.old backup file' do
-      expect(chef_run).to delete_file('c:/ops/jenkins/labels.txt.old')
+      expect(chef_run).to delete_file('d:/ci/labels.txt.old')
     end
   end
 end

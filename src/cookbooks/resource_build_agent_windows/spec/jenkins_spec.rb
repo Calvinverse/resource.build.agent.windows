@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'resource_build_agent_windows::jenkins' do
   jenkins_logs_path = 'c:/logs/jenkins'
-  jenkins_bin_path = 'c:/ops/jenkins'
+  jenkins_bin_path = 'd:/ci'
   jolokia_bin_path = 'c:/ops/jolokia'
   jenkins_secrets_path = 'c:/secrets/jenkins'
 
@@ -117,6 +117,7 @@ describe 'resource_build_agent_windows::jenkins' do
       windows
       windows_2016
       powershell
+      cmd
     TXT
     it 'creates labels.txt in the jenkins ops directory' do
       expect(chef_run).to create_file("#{jenkins_bin_path}/labels.txt").with_content(labels_file_content)
@@ -291,7 +292,7 @@ describe 'resource_build_agent_windows::jenkins' do
       {{ if keyExists "config/environment/directory/users/builds/agent" }}
       {{ if keyExists "config/services/builds/protocols/http/virtualdirectory" }}
           $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-          $startInfo.FileName = "java"
+          $startInfo.FileName = "c:/languages/java/jdk-11.0.2/bin/java.exe"
           $startInfo.RedirectStandardOutput = $true
           $startInfo.RedirectStandardError = $true
           $startInfo.UseShellExecute = $false
@@ -304,7 +305,6 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -XX:+ParallelRefProcEnabled' `
               + ' -XX:+UseStringDeduplication' `
               + ' -XX:+CMSParallelRemarkEnabled' `
-              + ' -XX:+CMSIncrementalMode' `
               + ' -XX:CMSInitiatingOccupancyFraction=75' `
               + ' -Xmx500m' `
               + ' -Xms500m' `

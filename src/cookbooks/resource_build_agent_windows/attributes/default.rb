@@ -9,6 +9,7 @@ ops_path = 'c:/ops'
 secrets_path = 'c:/secrets'
 temp_path = 'c:/temp'
 tools_path = 'c:/tools'
+ci_path = 'd:/ci'
 
 #
 # CONSULTEMPLATE
@@ -29,6 +30,7 @@ default['paths']['ops'] = ops_path
 default['paths']['secrets'] = secrets_path
 default['paths']['temp'] = temp_path
 default['paths']['tools'] = tools_path
+default['paths']['ci'] = ci_path
 
 #
 # FIREWALL
