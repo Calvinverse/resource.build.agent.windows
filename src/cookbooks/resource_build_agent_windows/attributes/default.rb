@@ -158,6 +158,12 @@ default['telegraf']['service']['name'] = 'telegraf'
 default['telegraf']['config_directory'] = "#{config_path}/#{node['telegraf']['service']['name']}"
 
 #
+# BUILDSCRIPTS
+#
+
+default['buildscripts']['path']['config'] = "#{config_path}/builds"
+
+#
 # WINSW
 #
 
