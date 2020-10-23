@@ -3,8 +3,9 @@ function Initialize-CustomResource
     [CmdletBinding()]
     param()
 
-    # For some reason we lose the workspace symbolic link if we create it with Chef. So we don't and create it
-    # when provisioning the box
+    # When we sysprep the box the SIDs for the users are changes. All files on the OS volume are updated
+    # but the ones on the non-OS volumes are not: see: http://technet.microsoft.com/en-us/library/hh825209.aspx
+    # So the Jenkins user loses its access to the  d:\ci folder. So we have to put them back
 
     $ErrorActionPreference = 'Stop'
 
@@ -13,12 +14,16 @@ function Initialize-CustomResource
     $workspaceDrive = Get-Volume -FileSystemLabel 'workspace'
     $workspaceDriveLetter = $workspaceDrive.DriveLetter
 
-    $workspaceDirectory = 'c:\ops\jenkins\workspace'
+    $ciPath = Join-Path "$($workspaceDriveLetter):" 'ci'
+    $acl = Get-ACL -Path $ciPath
 
-    Write-Output "Creating the workspace directory as a symbolic link to $($workspaceDriveLetter)"
-    New-Item -Path $workspaceDirectory -ItemType SymbolicLink -Value "$($workspaceDriveLetter):\\"
-
-    $dir = Get-Item $workspaceDirectory
-    Write-Output "Directory link type is: $($dir.LinkType)"
-    Write-Output "Directory link target is: $($dir.Target)"
+    $acl.SetAccessRuleProtection($True, $True)
+    $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+        'jenkins_user',
+        "Modify",
+        "ContainerInherit, ObjectInherit",
+        "None",
+        "Allow")
+    $acl.AddAccessRule($rule)
+    Set-Acl $ciPath $acl
 }

@@ -1,12 +1,12 @@
 Describe 'The jenkins application' {
     Context 'is installed' {
-        It 'with binaries in c:\ops\jenkins' {
-            'c:\ops\jenkins\jenkins_service.exe' | Should Exist
-            'c:\ops\jenkins\jenkins_service.exe.config' | Should Exist
-            'c:\ops\jenkins\jenkins_service.xml' | Should Exist
-            'c:\ops\jenkins\slave.jar' | Should Exist
-            'c:\ops\jenkins\labels.txt' | Should Exist
-            'c:\ops\jenkins\labels.txt.old' | Should Not Exist
+        It 'with binaries in d:\ci' {
+            'd:\ci\jenkins_service.exe' | Should Exist
+            'd:\ci\jenkins_service.exe.config' | Should Exist
+            'd:\ci\jenkins_service.xml' | Should Exist
+            'd:\ci\slave.jar' | Should Exist
+            'd:\ci\labels.txt' | Should Exist
+            'd:\ci\labels.txt.old' | Should Not Exist
         }
 
         It 'with jolokia binaries in c:\ops\jolokia' {
@@ -14,19 +14,25 @@ Describe 'The jenkins application' {
         }
     }
 
-    Context 'has a redirected workspace directory' {
-        It 'has a workspace directory' {
-            'c:\ops\jenkins\workspace' | Should Exist
+    Context 'has a ci directory' {
+        It 'has a ci directory' {
+            'd:\ci' | Should Exist
         }
 
-        $dir = Get-Item 'c:\ops\jenkins\workspace'
+        $acl = Get-Acl 'd:/ci'
+        $access = $acl.Access
+        It 'has the correct permissions' {
+            $access[0].IdentityReference | Should Be 'BUILTIN\Administrators'
+            $access[0].FileSystemRights | Should Be 'FullControl'
+            $access[0].AccessControlType | Should Be 'Allow'
 
-        It 'is a symbolic link' {
-            $dir.LinkType | Should Match 'SymbolicLink'
-        }
+            $access[1].IdentityReference | Should Be 'BUILTIN\Administrators'
+            $access[1].FileSystemRights | Should Be '268435456'
+            $access[1].AccessControlType | Should Be 'Allow'
 
-        It 'that points to the correct target' {
-            $dir.Target | Should Be 'd:\'
+            $access[2].IdentityReference | Should BeLike '*\jenkins_user'
+            $access[2].FileSystemRights | Should Be 'Modify, Synchronize'
+            $access[2].AccessControlType | Should Be 'Allow'
         }
     }
 

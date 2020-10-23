@@ -162,6 +162,17 @@ powershell_script 'install_npm' do
 end
 
 #
+# INSTALL YARN
+#
+
+windows_package 'Yarn' do
+  action :install
+  installer_type :msi
+  source node['yarn']['url']
+  timeout 2400
+end
+
+#
 # ADD TO THE JENKINS LABELS FILE
 #
 
@@ -170,6 +181,8 @@ ruby_block 'add_nodejs_label' do
   block do
     file = Chef::Util::FileEdit.new(jenkins_labels_file)
     file.insert_line_if_no_match('nodejs', 'nodejs')
+    file.insert_line_if_no_match('npm', 'npm')
+    file.insert_line_if_no_match('yarn', 'yarn')
     file.write_file
   end
 end
