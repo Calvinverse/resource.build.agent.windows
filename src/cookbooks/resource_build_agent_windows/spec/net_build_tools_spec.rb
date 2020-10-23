@@ -27,6 +27,13 @@ describe 'resource_build_agent_windows::net_build_tools' do
       )
     end
 
+    it 'installs the .NET 4.8 SDK' do
+      expect(chef_run).to install_windows_package('.NET 4.8 SDK').with(
+        installer_type: :custom,
+        source: 'https://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c8c829444416e811be84c5765ede6148/ndp48-devpack-enu.exe'
+      )
+    end
+
     it 'adds msbuild to the path' do
       expect(chef_run).to add_windows_path('C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64')
     end

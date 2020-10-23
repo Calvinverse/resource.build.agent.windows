@@ -38,11 +38,17 @@ windows_package 'MsBuild' do
   timeout 2400
 end
 
+windows_package '.NET 4.8 SDK' do
+  action :install
+  installer_type :custom
+  source node['net_48_sdk']['url']
+end
+
 #
 # ADD MSBUILD TO THE PATH
 #
 
-windows_path 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64' do
+windows_path node['msbuild']['path']['bin']['x64'] do
   action :add
 end
 
