@@ -9,7 +9,13 @@ ops_path = 'c:/ops'
 secrets_path = 'c:/secrets'
 temp_path = 'c:/temp'
 tools_path = 'c:/tools'
-ci_path = 'd:/ci'
+
+# Make sure the casing of the D-drive is the same as what Windows thinks it should be because
+# jenkins will use the value of this variable but NPM builds that run on the box will use
+# the windows path, which means path comparisons will go wrong because NPM doesn't understand
+# that Windows paths are case-insensitive (or probably more likely the tests don't understand
+# that)
+ci_path = 'D:/ci'
 
 #
 # CONSULTEMPLATE
