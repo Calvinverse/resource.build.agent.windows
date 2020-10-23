@@ -16,21 +16,21 @@
 
         "vm_import_directory": null,
         "vm_name": "not_really_a_vm_name",
-        "vm_ram_size_in_mb": "1024",
+        "vm_ram_size_in_mb": "2048",
         "vm_switch_name": "this_switch_does_not_exist",
         "vm_switch_vlan": ""
     },
     "builders": [
         {
-            "boot_wait": "5s",
             "boot_command": [],
-            "clone_from_vmxc_path": "{{ user `dir_vm_import` }}",
+            "boot_wait": "5s",
+            "clone_from_vmcx_path": "{{ user `dir_vm_import` }}",
             "communicator": "winrm",
             "enable_dynamic_memory": false,
             "enable_mac_spoofing": false,
             "enable_secure_boot": false,
             "enable_virtualization_extensions": false,
-            "generation": 2,
+            "generation": 1,
             "guest_additions_mode": "disable",
             "headless": true,
             "http_port_min": 8150,
@@ -38,7 +38,7 @@
             "output_directory": "{{ user `dir_temp` }}/{{ user `vm_name` }}",
             "ram_size": "{{ user `vm_ram_size_in_mb` }}",
             "secondary_iso_images": [
-                "{{ user `dir_deploy` }}/windows.iso"
+                "{{ user `dir_deploy` }}/unattend.iso"
             ],
             "shutdown_command": "CALL f:\\run-sysprep.cmd & IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
             "shutdown_timeout": "20m",
@@ -66,7 +66,14 @@
         },
 
         {
-            "inline": "$ErrorActionPreference = 'Stop'; Get-WmiObject -Class Win32_volume -Filter 'DriveType=5' | Select-Object -First 1 | Set-WmiInstance -Arguments @{DriveLetter='f:'}",
+            "inline": "Get-PSDrive",
+            "type": "powershell"
+        },
+
+        {
+            "inline": [
+                "$ErrorActionPreference = 'Stop'; Get-WmiObject -Class Win32_volume -Filter 'DriveType=5' | Select-Object -First 1 | Set-WmiInstance -Arguments @{DriveLetter='f:'}"
+            ],
             "type": "powershell"
         },
         {
@@ -78,6 +85,16 @@
             "destination": "c:/config/unbound/unbound_zones.conf",
             "source": "{{ user `dir_src_provisioning` }}/unbound_zones.conf",
             "type": "file"
+        },
+
+        {
+            "restart_timeout": "20m",
+            "type": "windows-restart"
+        },
+
+        {
+            "inline": "Get-PSDrive",
+            "type": "powershell"
         },
 
         {
@@ -93,7 +110,7 @@
             "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": [
                 "$ErrorActionPreference = 'Stop'; New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/workspace.vhdx' -SizeBytes 100GB",
-                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/workspace.vhdx'"
+                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -ControllerType SCSI -ControllerNumber 0 -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/workspace.vhdx'"
             ],
             "tempfile_extension": ".ps1",
             "type": "shell-local"
@@ -111,7 +128,7 @@
             "execute_command": ["powershell.exe", "{{.Vars}} {{.Script}}"],
             "inline": [
                 "$ErrorActionPreference = 'Stop'; New-VHD -Path '{{ user `dir_temp` }}/{{ build_name }}/Virtual Hard Disks/cache.vhdx' -SizeBytes 50GB -BlockSizeBytes 1MB",
-                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/cache.vhdx'"
+                "$ErrorActionPreference = 'Stop'; Add-VmHardDiskDrive -VMName {{ user `vm_name` }} -ControllerType SCSI -ControllerNumber 0 -Path '{{ user `dir_temp` }}/{{build_name}}/Virtual Hard Disks/cache.vhdx'"
             ],
             "tempfile_extension": ".ps1",
             "type": "shell-local"
@@ -121,6 +138,16 @@
                 "$ErrorActionPreference = 'Stop'; $disk = Get-Disk | Where-Object partitionstyle -eq 'raw'; $disk | Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'cache' -Confirm:$false; $disk | Set-Disk -IsOffline $false",
                 "$ErrorActionPreference = 'Stop'; Get-Disk"
             ],
+            "type": "powershell"
+        },
+
+        {
+            "restart_timeout": "20m",
+            "type": "windows-restart"
+        },
+
+        {
+            "inline": "Get-PSDrive",
             "type": "powershell"
         },
 
@@ -139,7 +166,7 @@
         {
             "elevated_password": "{{ user `admin_password` }}",
             "elevated_user": "{{ user `admin_username` }}",
-            "inline": "& c:\\temp_dvd\\eis-chef.exe --local-mode --config c:\\temp_dvd\\client.rb --override-runlist \"{{ user `cookbook_name` }}::default\" --log-level info ",
+            "inline": "& c:\\temp_dvd\\eis-chef.exe --local-mode --config c:\\temp_dvd\\client.rb --override-runlist \"{{ user `cookbook_name` }}::default\" --log-level info --chef-license accept-no-persist",
             "type": "powershell"
         },
         {

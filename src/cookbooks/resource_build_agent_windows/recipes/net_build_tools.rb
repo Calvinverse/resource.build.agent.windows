@@ -23,29 +23,32 @@ msbuild_install_options =
   ' --wait' \
   ' --nocache' \
   ' --noUpdateInstaller' \
-  ' --add "Microsoft.VisualStudio.Workload.AzureBuildTools;includeRecommended"' \
-  ' --add "Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools;includeRecommended"' \
-  ' --add "Microsoft.VisualStudio.Workload.MSBuildTools"' \
-  ' --add "Microsoft.VisualStudio.Workload.NetCoreBuildTools"' \
-  ' --add "Microsoft.VisualStudio.Workload.VCTools"' \
-  ' --add "Microsoft.VisualStudio.Workload.WebBuildTools;includeRecommended"' \
-  ' --add "Microsoft.Net.Component.4.7.1.SDK"' \
-  ' --add "Microsoft.Net.Component.4.7.1.TargetingPack"' \
-  ' --add "Microsoft.Net.ComponentGroup.4.7.1.DeveloperTools"'
+  ' --add "Microsoft.VisualStudio.Workload.Azure;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.Data;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.ManagedDesktop;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.NetCoreTools;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.NetWeb;includeRecommended"' \
+  ' --add "Microsoft.VisualStudio.Workload.NativeDesktop;includeRecommended"'
 
 windows_package 'MsBuild' do
   action :install
   installer_type :custom
   options msbuild_install_options
-  source node['net_build_tools']['url']
-  timeout 1200
+  source node['net_visual_studio']['url']
+  timeout 2400
+end
+
+windows_package '.NET 4.8 SDK' do
+  action :install
+  installer_type :custom
+  source node['net_48_sdk']['url']
 end
 
 #
 # ADD MSBUILD TO THE PATH
 #
 
-windows_path 'C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/amd64' do
+windows_path node['msbuild']['path']['bin']['x64'] do
   action :add
 end
 
@@ -58,6 +61,16 @@ ruby_block 'add_msbuild_label' do
   block do
     file = Chef::Util::FileEdit.new(jenkins_labels_file)
     file.insert_line_if_no_match('msbuild', 'msbuild')
+    file.insert_line_if_no_match('msbuild_16', 'msbuild_16')
+    file.write_file
+  end
+end
+
+ruby_block 'add_visualstudio_label' do
+  block do
+    file = Chef::Util::FileEdit.new(jenkins_labels_file)
+    file.insert_line_if_no_match('visualstudio', 'visualstudio')
+    file.insert_line_if_no_match('visualstudio_2019', 'visualstudio_2019')
     file.write_file
   end
 end
