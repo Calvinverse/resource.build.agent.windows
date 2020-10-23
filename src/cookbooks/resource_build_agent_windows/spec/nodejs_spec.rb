@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'resource_build_agent_windows::nodejs' do
+  yarn_version = '1.17.3'
+
   context 'sets the NPM cache location' do
     let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
@@ -86,6 +88,15 @@ describe 'resource_build_agent_windows::nodejs' do
 
     it 'deletes the labels.txt.old backup file' do
       expect(chef_run).to delete_file('d:/ci/labels.txt.old')
+    end
+  end
+
+  context '' do
+    it 'installs Yarn' do
+      expect(chef_run).to install_windows_package('Yarn').with(
+        installer_type: :msi,
+        source: "https://github.com/yarnpkg/yarn/releases/download/v#{yarn_version}/yarn-#{yarn_version}.msi"
+      )
     end
   end
 end
