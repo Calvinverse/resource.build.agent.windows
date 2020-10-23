@@ -57,9 +57,9 @@ default['firewall']['paths']['logs'] = "#{logs_path}/firewall"
 # GIT
 #
 
-default['git']['version'] = '2.21.0'
+default['git']['version'] = '2.24.0.2'
 default['git']['architecture'] = '64'
-default['git']['checksum'] = 'C7792387EBD69B3E11B7CC7B92C743F75C180275FA0CE9C7F0C5C7E44E470F80'
+default['git']['checksum'] = 'AF679D8B3DBEB84C95C6C7F3BE2F200A58D85201552CA0594FB7A3F4EE99CB38'
 default['git']['url'] = "https://github.com/git-for-windows/git/releases/download/v#{node['git']['version']}.windows.1/Git-#{node['git']['version']}-#{node['git']['architecture']}-bit.exe"
 default['git']['display_name'] = "Git version #{node['git']['version']}"
 
@@ -83,8 +83,8 @@ default['jenkins']['service']['name'] = 'jenkins'
 default['jenkins']['service']['user_name'] = 'jenkins_user' # This user name is also in the Initialize-CustomResource.ps1 script
 default['jenkins']['service']['user_password'] = SecureRandom.uuid
 
-default['jenkins']['version'] = '3.15'
-default['jenkins']['checksum'] = '6812E86A220D2D6C4D3FFFABD646B7BB19A4144693958B2A943FA6B845F081B1'
+default['jenkins']['version'] = '3.17'
+default['jenkins']['checksum'] = 'F5480B39BB54F8D7A91749E61D34199AA533F9CEB1D329EDCC6D404BEEC3A617'
 default['jenkins']['url']['jar'] = "https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/#{node['jenkins']['version']}/swarm-client-#{node['jenkins']['version']}.jar"
 
 default['jenkins']['file']['consul_template_run_script_file'] = 'jenkins_run_script.ctmpl'
@@ -103,8 +103,8 @@ default['jolokia']['agent']['port'] = 8090
 
 default['jolokia']['telegraf']['consul_template_inputs_file'] = 'telegraf_jolokia_inputs.ctmpl'
 
-default['jolokia']['version'] = '1.6.0'
-default['jolokia']['checksum'] = '40123D4728CB62BF7D4FD3C8DE7CF3A0F955F89453A645837E611BA8E6924E02'
+default['jolokia']['version'] = '1.6.2'
+default['jolokia']['checksum'] = '95EEF794790AA98CFA050BDE4EC67A4E42C2519E130E5E44CE40BF124584F323'
 default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/#{node['jolokia']['version']}/jolokia-jvm-#{node['jolokia']['version']}-agent.jar"
 
 #
@@ -112,6 +112,10 @@ default['jolokia']['url']['jar'] = "http://search.maven.org/remotecontent?filepa
 #
 
 default['net_visual_studio']['url'] = 'https://aka.ms/vs/16/release/vs_enterprise.exe'
+default['msbuild']['path']['bin']['x64'] = 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64'
+default['msbuild']['path']['bin']['x86'] = 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin'
+
+default['net_48_sdk']['url'] = 'https://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c8c829444416e811be84c5765ede6148/ndp48-devpack-enu.exe'
 
 #
 # NODE / NPM / YARN
@@ -130,6 +134,10 @@ default['nvm']['path']['exe'] = "#{node['nvm']['path']['bin']}/nvm.exe"
 
 default['npm']['version'] = '6.9.0'
 default['npm']['path']['cache'] = 'e:/npm'
+
+default['yarn']['version'] = '1.17.3'
+default['yarn']['checksum'] = '46E618592076FF2882A5D7E1D4F8D0FFB8B29918A6366A1FEA0F0BBDF145A4FA'
+default['yarn']['url'] = "https://github.com/yarnpkg/yarn/releases/download/v#{node['yarn']['version']}/yarn-#{node['yarn']['version']}.msi"
 
 default['yarn']['path']['cache'] = 'e:/yarn'
 
