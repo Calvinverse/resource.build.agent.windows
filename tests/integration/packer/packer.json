@@ -18,13 +18,13 @@
         {
             "boot_command": [],
             "boot_wait": "150s",
-            "clone_from_vmxc_path": "{{ user `dir_temp` }}/{{ user `vm_name` }}/resource",
+            "clone_from_vmcx_path": "{{ user `dir_temp` }}/{{ user `vm_name` }}/resource",
             "communicator": "winrm",
             "enable_dynamic_memory": false,
             "enable_mac_spoofing": false,
             "enable_secure_boot": true,
             "enable_virtualization_extensions": false,
-            "generation": 2,
+            "generation": 1,
             "guest_additions_mode": "disable",
             "headless": true,
             "http_directory": "",
@@ -51,8 +51,19 @@
     ],
     "provisioners": [
         {
+            "inline": "Get-PSDrive",
+            "type": "powershell"
+        },
+
+        {
+            "inline": "$acl = Get-Acl 'd:/ci'; $acl.Access",
+            "type": "powershell"
+        },
+
+        {
             "elevated_user": "{{user `admin_username`}}",
             "elevated_password": "{{user `admin_password`}}",
+            "execute_command": "powershell.exe -NoProfile -NonInteractive \"if (Test-Path variable:global:ProgressPreference){`$ProgressPreference='SilentlyContinue'}; & '{{.Path}}';exit `$LastExitCode\"; exit $LastExitCode",
             "scripts": [
                 "{{ user `dir_scripts_user` }}/Invoke-Tests.ps1"
             ],
