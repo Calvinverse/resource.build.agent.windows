@@ -252,10 +252,8 @@ jenkins_labels_file = node['jenkins']['file']['labels_file']
 file jenkins_labels_file do
   action :create
   content <<~TXT
-    windows
-    windows_2016
-    powershell
-    cmd
+    os_windows
+    tool_powershell
   TXT
 end
 
@@ -466,7 +464,10 @@ file "#{consul_template_template_path}/#{jenkins_run_script_template_file}" do
             + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}' `
             + ' -mode exclusive' `
             + ' -username {{ key "config/environment/directory/users/builds/agent" }}' `
-            + ' -passwordFile #{jenkins_password_file}'
+            + ' -passwordFile #{jenkins_password_file}' `
+            + ' --toolLocation tool_global_git=C:/Program Files/Git/cmd/git.exe' `
+            + ' --toolLocation tool_global_msbuild_x64=#{node['msbuild']['path']['bin']['x64']}/msbuild.exe' `
+            + ' --toolLocation tool_global_msbuild_x86=#{node['msbuild']['path']['bin']['x86']}/msbuild.exe'
         $startInfo.Arguments = $arguments
 
         $process = New-Object System.Diagnostics.Process

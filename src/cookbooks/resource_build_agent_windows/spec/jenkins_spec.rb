@@ -114,10 +114,8 @@ describe 'resource_build_agent_windows::jenkins' do
     let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
     labels_file_content = <<~TXT
-      windows
-      windows_2016
-      powershell
-      cmd
+      os_windows
+      tool_powershell
     TXT
     it 'creates labels.txt in the jenkins ops directory' do
       expect(chef_run).to create_file("#{jenkins_bin_path}/labels.txt").with_content(labels_file_content)
@@ -321,7 +319,10 @@ describe 'resource_build_agent_windows::jenkins' do
               + ' -master http://{{ key "config/services/builds/protocols/http/host" }}.service.{{ key "config/services/consul/domain" }}:{{ key "config/services/builds/protocols/http/port" }}/{{ key "config/services/builds/protocols/http/virtualdirectory" }}' `
               + ' -mode exclusive' `
               + ' -username {{ key "config/environment/directory/users/builds/agent" }}' `
-              + ' -passwordFile #{jenkins_secrets_path}/user.txt'
+              + ' -passwordFile #{jenkins_secrets_path}/user.txt' `
+              + ' --toolLocation git=C:/Program Files/Git/cmd/git.exe' `
+              + ' --toolLocation msbuild_x64=C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64/msbuild.exe' `
+              + ' --toolLocation msbuild_x86=C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/msbuild.exe'
           $startInfo.Arguments = $arguments
 
           $process = New-Object System.Diagnostics.Process
